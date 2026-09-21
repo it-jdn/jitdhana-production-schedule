@@ -66,7 +66,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   box-shadow:0 1px 4px rgba(60,64,67,.1);
 }
 .th-name-fixed{
-  width:152px;flex-shrink:0;
+  width:120px;flex-shrink:0;
   border-right:1px solid var(--border);
   display:flex;align-items:center;justify-content:flex-end;
   padding-right:14px;background:var(--surface);
@@ -114,7 +114,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 .row{display:flex;height:60px;border-bottom:1px solid var(--border);}
 .row:last-child{border-bottom:none;}
 .row-name{
-  width:152px;flex-shrink:0;
+  width:120px;flex-shrink:0;
   border-right:1px solid var(--border);
   display:flex;align-items:center;padding:0 10px;gap:9px;
   background:var(--surface);position:sticky;left:0;z-index:10;
@@ -283,7 +283,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
     <span class="app-title"><b>ตารางผลิต</b> ครัวกลาง</span>
   </div>
   <div class="topbar-gap"></div>
-  <span class="date-chip">กันยายน 2569 · 07:00–17:00</span>
+  <span class="date-chip">กันยายน 2569 · 08:00–17:00</span>
   <div class="brk-chip">
     <div class="brk-chip-dot"></div>
     พักเบรก 12:30–13:15
@@ -319,7 +319,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 <div class="stats-bar">
   <div class="stat"><div class="val" id="sv-w">12</div><div class="lbl">ผู้ปฏิบัติงาน</div></div>
   <div class="stat"><div class="val" id="sv-t">–</div><div class="lbl">งานทั้งหมด</div></div>
-  <div class="stat"><div class="val">10h</div><div class="lbl">ชั่วโมงทำการ</div></div>
+  <div class="stat"><div class="val">9h</div><div class="lbl">ชั่วโมงทำการ</div></div>
   <div class="stat"><div class="val">45m</div><div class="lbl">ช่วงพักเบรก</div></div>
   <div class="stat"><div class="val">6 วัน</div><div class="lbl">ต่อสัปดาห์</div></div>
 </div>
@@ -327,9 +327,9 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 <div id="tip"></div>
 
 <script>
-const DAY_START=7*60, DAY_END=17*60, TOTAL=DAY_END-DAY_START;
+const DAY_START=8*60, DAY_END=17*60, TOTAL=DAY_END-DAY_START;
 const BREAK_S=12*60+30, BREAK_E=13*60+15;
-const NAME_W=152;
+const NAME_W=120;
 
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minToTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
