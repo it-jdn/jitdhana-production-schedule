@@ -369,9 +369,19 @@ const LG=[
   {k:'special',n:'งานพิเศษ'},{k:'flour',n:'แป้ง/ขนม'},{k:'clean',n:'ทำความสะอาด'},
 ];
 
-let SCALE=2;
-function tL(m){return(m-DAY_START)*SCALE;}
-function xToMin(x){return DAY_START+x/SCALE;}
+let SCALE=2, OFFSET=0;
+const BRK_VIS=30; // visual px for break zone
+function tL(m){
+  if(m<=BREAK_S) return(m-DAY_START)*SCALE;
+  if(m>=BREAK_E) return(m-DAY_START)*SCALE-OFFSET;
+  return(BREAK_S-DAY_START)*SCALE+(m-BREAK_S)/(BREAK_E-BREAK_S)*BRK_VIS;
+}
+function xToMin(x){
+  const bx=(BREAK_S-DAY_START)*SCALE;
+  if(x<=bx) return DAY_START+x/SCALE;
+  if(x>=bx+BRK_VIS) return BREAK_E+(x-bx-BRK_VIS)/SCALE;
+  return BREAK_S+(x-bx)/BRK_VIS*(BREAK_E-BREAK_S);
+}
 
 // ─── Drag & Popover state ───
 let drag=null, ghostEl=null, outHandler=null;
@@ -520,16 +530,19 @@ function build(){
   closePopover();
 
   const gs=document.getElementById('gs');
-  const avail=Math.max(gs.clientWidth-NAME_W,640);
-  SCALE=(avail+60)/TOTAL;
-  const TW=TOTAL*SCALE;
-  const bL=(BREAK_S-DAY_START)*SCALE, bW=(BREAK_E-BREAK_S)*SCALE;
+  const NON_BRK=TOTAL-(BREAK_E-BREAK_S); // 495 min of non-break time
+  SCALE=Math.max((gs.clientWidth-NAME_W-BRK_VIS-40)/NON_BRK,1);
+  OFFSET=(BREAK_E-BREAK_S)*SCALE-BRK_VIS;
+  const TW=TOTAL*SCALE-OFFSET;
+  const bL=(BREAK_S-DAY_START)*SCALE, bW=BRK_VIS;
 
   // Time header
   let ticks='';
   for(let m=0;m<=TOTAL;m+=30){
-    const a=DAY_START+m,h=Math.floor(a/60),mn=a%60;
-    ticks+=`<div class="tick" style="left:${m*SCALE}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
+    const a=DAY_START+m;
+    if(a>BREAK_S&&a<BREAK_E) continue;
+    const h=Math.floor(a/60),mn=a%60;
+    ticks+=`<div class="tick" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
   }
   document.getElementById('th-inner').style.width=(TW+40)+'px';
   document.getElementById('th-inner').innerHTML=
@@ -543,8 +556,10 @@ function build(){
     const avColor=AV_COLORS[wi%AV_COLORS.length];
     let gridLines='';
     for(let m=0;m<=TOTAL;m+=30){
-      const isHour=(DAY_START+m)%60===0;
-      gridLines+=`<div class="vgrid${isHour?' vgrid-hour':''}" style="left:${m*SCALE}px"></div>`;
+      const a=DAY_START+m;
+      if(a>BREAK_S&&a<BREAK_E) continue;
+      const isHour=a%60===0;
+      gridLines+=`<div class="vgrid${isHour?' vgrid-hour':''}" style="left:${tL(a)}px"></div>`;
     }
     const tasks=w.t.map(tk=>{
       const col=C[tk.c]||C.other;
