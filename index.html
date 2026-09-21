@@ -86,11 +86,11 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   font-family:'IBM Plex Mono',monospace;
   font-size:10.5px;color:var(--text-2);font-weight:600;white-space:nowrap;
 }
-/* 17:00 end-of-day tick: label to the LEFT of the line */
-.tick-last{
-  border-left:none;border-right:1px solid var(--border);
-  padding-left:0;padding-right:6px;
-  transform:translateX(-100%);justify-content:flex-end;
+/* 17:00 end-of-day label: pinned to right edge of th-inner */
+.tick-end{
+  position:absolute;top:0;bottom:0;right:0;
+  display:flex;align-items:center;padding-right:5px;
+  border-right:1px solid var(--border);
 }
 .brk-th{
   position:absolute;top:0;bottom:0;overflow:hidden;
@@ -547,15 +547,17 @@ function build(){
   for(let m=0;m<=TOTAL;m+=30){
     const a=DAY_START+m;
     if(a>BREAK_S&&a<BREAK_E) continue;
+    if(a===DAY_END) continue; // 17:00 rendered as fixed end-label
     const h=Math.floor(a/60),mn=a%60;
-    const isLast=a===DAY_END;
-    ticks+=`<div class="tick${isLast?' tick-last':''}" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
+    ticks+=`<div class="tick" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
   }
   // break-end tick line only (no label — too close to 13:30)
   ticks+=`<div class="tick" style="left:${tL(BREAK_E)}px"></div>`;
   document.getElementById('th-inner').style.width=TW+'px';
   document.getElementById('th-inner').innerHTML=
-    ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`;
+    ticks+
+    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`+
+    `<div class="tick-end"><span>17:00</span></div>`;
 
   // Rows
   const tip=document.getElementById('tip');
