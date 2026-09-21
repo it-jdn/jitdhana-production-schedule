@@ -1,0 +1,642 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<title>ตารางผู้ปฏิบัติงาน</title>
+<style>
+:root {
+  --bg: #fff;
+  --surface: #fff;
+  --sf-dim: #f8f9fa;
+  --sf-hover: #f1f3f4;
+  --border: #dadce0;
+  --border-s: #bdc1c6;
+  --text: #202124;
+  --text-2: #5f6368;
+  --text-3: #9aa0a6;
+  --accent: #1a73e8;
+  --accent-lt: #e8f0fe;
+  --accent-dk: #1557b0;
+  --red: #d93025;
+  --yellow: #b06000;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--text);}
+
+/* ─── Topbar ─── */
+.topbar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:60;
+  background:var(--surface);
+  box-shadow:0 1px 3px rgba(60,64,67,.25),0 2px 8px 2px rgba(60,64,67,.1);
+  display:flex;align-items:center;gap:8px;padding:0 16px;height:64px;
+}
+.logo-wrap{display:flex;align-items:center;gap:12px;margin-right:8px;}
+.logo-svg{width:40px;height:40px;flex-shrink:0;}
+.app-title{font-size:18px;font-weight:400;color:var(--text-2);white-space:nowrap;letter-spacing:-.3px;}
+.app-title b{color:var(--text);font-weight:600;}
+.topbar-gap{flex:1;}
+.date-chip{font-size:13px;font-weight:500;color:var(--text-2);white-space:nowrap;padding:0 4px;}
+.brk-chip{
+  display:flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:500;color:var(--text-3);
+  background:var(--sf-dim);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;white-space:nowrap;
+}
+.brk-chip-dot{width:7px;height:7px;border-radius:50%;background:#bdc1c6;flex-shrink:0;}
+.btn-create{
+  display:flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:24px;
+  padding:10px 22px;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;white-space:nowrap;
+  box-shadow:0 1px 2px rgba(60,64,67,.25),0 1px 3px 1px rgba(60,64,67,.12);
+  transition:background .15s,box-shadow .15s;
+}
+.btn-create:hover{
+  background:var(--accent-dk);
+  box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.18);
+}
+
+/* ─── Time header ─── */
+.th-band{
+  position:sticky;
+  top:calc(64px + env(safe-area-inset-top,0px));
+  z-index:50;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;height:40px;
+  box-shadow:0 1px 4px rgba(60,64,67,.1);
+}
+.th-name-fixed{
+  width:152px;flex-shrink:0;
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:14px;background:var(--surface);
+}
+.th-name-fixed span{
+  font-size:10px;font-weight:600;color:var(--text-3);
+  letter-spacing:.08em;text-transform:uppercase;
+}
+.th-axis-clip{flex:1;overflow:hidden;position:relative;}
+.th-axis-inner{position:relative;height:100%;}
+.tick{
+  position:absolute;top:0;bottom:0;
+  display:flex;align-items:center;padding-left:6px;
+  border-left:1px solid var(--border);
+}
+.tick span{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;color:var(--text-3);font-weight:500;white-space:nowrap;
+}
+.brk-th{
+  position:absolute;top:0;bottom:0;
+  background:#fef3f2;
+  border-left:1px dashed var(--border-s);
+  border-right:1px dashed var(--border-s);
+  display:flex;align-items:center;justify-content:center;
+}
+.brk-th span{
+  font-size:8.5px;font-weight:600;color:#c5221f;
+  letter-spacing:.07em;font-family:'IBM Plex Mono',monospace;
+  text-transform:uppercase;
+}
+
+/* ─── Hint ─── */
+.grid-hint{
+  font-size:11.5px;font-weight:500;color:var(--text-3);
+  text-align:center;padding:5px;
+  border-bottom:1px solid var(--border);
+  background:var(--sf-dim);
+  letter-spacing:.01em;
+}
+
+/* ─── Grid ─── */
+.grid-scroll{overflow-x:auto;}
+.grid-inner{min-width:max-content;}
+.row{display:flex;height:60px;border-bottom:1px solid var(--border);}
+.row:last-child{border-bottom:none;}
+.row-name{
+  width:152px;flex-shrink:0;
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:9px;
+  background:var(--surface);position:sticky;left:0;z-index:10;
+}
+.avatar{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.row-name-text{
+  font-size:12.5px;font-weight:500;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:1;min-width:0;
+}
+.task-area{
+  flex:1;position:relative;background:var(--surface);cursor:crosshair;
+}
+.task-area:hover{background:#f8fbff;}
+.row:nth-child(even) .task-area{background:#fafbff;}
+.row:nth-child(even) .task-area:hover{background:#f3f7ff;}
+.brk-col{
+  position:absolute;top:0;bottom:0;
+  background:repeating-linear-gradient(-45deg,transparent,transparent 4px,rgba(0,0,0,.03) 4px,rgba(0,0,0,.03) 8px);
+  border-left:1px dashed var(--border);border-right:1px dashed var(--border);
+  pointer-events:none;z-index:6;
+}
+.task{
+  position:absolute;top:6px;bottom:6px;
+  border-radius:6px;display:flex;align-items:center;
+  padding:0 9px;cursor:pointer;overflow:hidden;
+  transition:filter .12s,box-shadow .12s,transform .1s;z-index:4;
+  box-shadow:0 1px 2px rgba(0,0,0,.12);
+}
+.task:hover{
+  filter:brightness(.9);
+  box-shadow:0 2px 8px rgba(60,64,67,.28),0 1px 3px rgba(60,64,67,.15);
+  transform:translateY(-1px);
+}
+.task span{
+  font-size:11.5px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+.ghost-task{
+  position:absolute;top:6px;bottom:6px;
+  background:var(--accent-lt);border:1.5px solid var(--accent);
+  border-radius:8px;pointer-events:none;z-index:8;
+  display:flex;align-items:center;padding-left:9px;opacity:.85;
+}
+.ghost-task span{
+  font-size:10.5px;font-weight:600;color:var(--accent);
+  white-space:nowrap;font-family:'IBM Plex Mono',monospace;
+}
+
+/* ─── Add Popover ─── */
+#apop{
+  position:fixed;z-index:300;width:300px;
+  background:var(--surface);border-radius:16px;overflow:hidden;
+  box-shadow:0 4px 6px -1px rgba(60,64,67,.25),0 10px 28px 4px rgba(60,64,67,.18);
+  animation:popIn .14s cubic-bezier(.22,1,.36,1);
+}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(-6px);}to{opacity:1;transform:none;}}
+.apop-stripe{height:5px;background:var(--accent);}
+.apop-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;}
+.apop-hdr{display:flex;align-items:center;justify-content:space-between;}
+.apop-who{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.apop-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.apop-x{
+  background:none;border:none;color:var(--text-3);cursor:pointer;
+  font-size:18px;line-height:1;border-radius:50%;
+  width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+  transition:background .1s;
+}
+.apop-x:hover{background:var(--sf-dim);color:var(--text-2);}
+.apop-times{display:flex;align-items:center;gap:8px;}
+.t-spin{
+  flex:1;display:flex;align-items:center;gap:1px;
+  border-bottom:2px solid var(--border);padding:6px 3px 4px;
+  transition:border-color .15s;
+}
+.t-spin:focus-within{border-color:var(--accent);}
+.t-part{
+  width:26px;border:none;background:transparent;outline:none;
+  font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;
+  color:var(--text);text-align:center;padding:0;-moz-appearance:textfield;
+}
+.t-part::-webkit-inner-spin-button,.t-part::-webkit-outer-spin-button{-webkit-appearance:none;}
+.t-colon{color:var(--text-2);font-size:14px;font-weight:600;font-family:'IBM Plex Mono',monospace;user-select:none;}
+.apop-tsep{color:var(--text-3);font-size:13px;flex-shrink:0;}
+.apop-warn{font-size:12px;padding:8px 12px;border-radius:8px;font-weight:500;line-height:1.45;}
+.warn-brk{background:#fce8e6;color:#c5221f;}
+.warn-ovlp{background:#fef7e0;color:#b06000;}
+.apop-name{
+  border:none;border-bottom:2px solid var(--border);
+  padding:8px 0;font-size:14px;font-family:'IBM Plex Sans Thai',sans-serif;
+  color:var(--text);outline:none;width:100%;background:transparent;
+  transition:border-color .15s;
+}
+.apop-name:focus{border-color:var(--accent);}
+.apop-name::placeholder{color:var(--text-3);}
+.apop-name.apop-err{border-color:var(--red);animation:shake .2s;}
+@keyframes shake{0%,100%{transform:none;}33%{transform:translateX(-4px);}66%{transform:translateX(4px);}}
+.apop-cat-lbl{font-size:10.5px;font-weight:600;color:var(--text-3);letter-spacing:.07em;text-transform:uppercase;}
+.apop-cats{display:flex;flex-wrap:wrap;gap:6px;}
+.apop-cat{
+  font-size:11px;font-weight:600;font-family:'IBM Plex Sans Thai',sans-serif;
+  padding:4px 11px;border-radius:20px;cursor:pointer;
+  background:var(--cg,#f1f3f4);color:var(--cf,#5f6368);
+  border:1.5px solid transparent;transition:border-color .1s,box-shadow .1s;
+}
+.apop-cat:hover{border-color:var(--cb,#9aa0a6);}
+.apop-cat-sel{border-color:var(--cb,#9aa0a6)!important;box-shadow:0 0 0 3px rgba(26,115,232,.15);}
+.apop-footer{display:flex;gap:6px;justify-content:flex-end;padding-top:2px;}
+.apop-cancel{
+  background:transparent;color:var(--accent);border:none;border-radius:4px;
+  padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'IBM Plex Sans Thai',sans-serif;transition:background .1s;
+}
+.apop-cancel:hover{background:var(--accent-lt);}
+.apop-save{
+  background:var(--accent);color:#fff;border:none;border-radius:4px;
+  padding:9px 22px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'IBM Plex Sans Thai',sans-serif;transition:background .1s;
+}
+.apop-save:hover{background:var(--accent-dk);}
+
+/* ─── Legend & Stats ─── */
+.legend-bar{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:10px 20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;
+}
+.lg-item{display:flex;align-items:center;gap:6px;}
+.lg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.lg-item span{font-size:11px;color:var(--text-2);font-weight:500;}
+.stats-bar{
+  background:var(--surface);border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;padding:14px 20px;
+}
+.stat .val{
+  font-size:22px;font-weight:700;color:var(--accent);line-height:1;
+  font-variant-numeric:tabular-nums;font-family:'IBM Plex Mono',monospace;
+}
+.stat .lbl{font-size:11px;color:var(--text-3);margin-top:3px;text-align:center;font-weight:500;}
+#tip{
+  position:fixed;z-index:200;pointer-events:none;display:none;
+  background:#3c4043;color:#fff;font-size:12px;line-height:1.5;
+  padding:8px 12px;border-radius:8px;box-shadow:0 2px 6px rgba(60,64,67,.3);
+  max-width:260px;white-space:pre-line;
+}
+
+@media(max-width:640px){.app-title,.brk-chip{display:none;}.topbar{padding:0 12px;gap:8px;}}
+</style>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="logo-wrap">
+    <!-- Calendar logo -->
+    <svg class="logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="9" width="32" height="27" rx="3" fill="white" stroke="#dadce0" stroke-width="1.5"/>
+      <rect x="4" y="9" width="32" height="10" rx="3" fill="#1a73e8"/>
+      <rect x="4" y="15" width="32" height="4" fill="#1a73e8"/>
+      <path d="M12 9V5M28 9V5" stroke="#1a73e8" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="10" y="25" width="5" height="5" rx="1" fill="#1a73e8"/>
+      <rect x="17.5" y="25" width="5" height="5" rx="1" fill="#fbbc04"/>
+      <rect x="25" y="25" width="5" height="5" rx="1" fill="#34a853"/>
+    </svg>
+    <span class="app-title"><b>ตารางผลิต</b> ครัวกลาง</span>
+  </div>
+  <div class="topbar-gap"></div>
+  <span class="date-chip">กันยายน 2569 · 07:00–17:00</span>
+  <div class="brk-chip">
+    <div class="brk-chip-dot"></div>
+    พักเบรก 12:30–13:15
+  </div>
+  <button class="btn-create" id="btn-create">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+    </svg>
+    สร้าง
+  </button>
+</div>
+
+<!-- Time header -->
+<div class="th-band">
+  <div class="th-name-fixed"><span>ผู้ปฏิบัติงาน</span></div>
+  <div class="th-axis-clip" id="th-clip">
+    <div class="th-axis-inner" id="th-inner"></div>
+  </div>
+</div>
+
+<!-- Hint -->
+<div class="grid-hint">คลิกหรือลากในช่องเพื่อเพิ่มงาน</div>
+
+<!-- Grid -->
+<div class="grid-scroll" id="gs">
+  <div class="grid-inner" id="gi"></div>
+</div>
+
+<!-- Legend -->
+<div class="legend-bar" id="legend"></div>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat"><div class="val" id="sv-w">12</div><div class="lbl">ผู้ปฏิบัติงาน</div></div>
+  <div class="stat"><div class="val" id="sv-t">–</div><div class="lbl">งานทั้งหมด</div></div>
+  <div class="stat"><div class="val">10h</div><div class="lbl">ชั่วโมงทำการ</div></div>
+  <div class="stat"><div class="val">45m</div><div class="lbl">ช่วงพักเบรก</div></div>
+  <div class="stat"><div class="val">6 วัน</div><div class="lbl">ต่อสัปดาห์</div></div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+const DAY_START=7*60, DAY_END=17*60, TOTAL=DAY_END-DAY_START;
+const BREAK_S=12*60+30, BREAK_E=13*60+15;
+const NAME_W=152;
+
+function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function minToTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
+function snap(m,step=15){return Math.round(m/step)*step;}
+function clamp(m){return Math.max(DAY_START,Math.min(m,DAY_END));}
+
+const C={
+  dist:   {bg:'#4285F4',fg:'#fff',   bd:'#3367d6'},
+  admin:  {bg:'#F9AB00',fg:'#202124',bd:'#f29900'},
+  measure:{bg:'#E37400',fg:'#fff',   bd:'#c75b00'},
+  seafood:{bg:'#9334E6',fg:'#fff',   bd:'#7627c7'},
+  veggie: {bg:'#188038',fg:'#fff',   bd:'#137333'},
+  meat:   {bg:'#0097A7',fg:'#fff',   bd:'#00838f'},
+  special:{bg:'#E8175D',fg:'#fff',   bd:'#c0134f'},
+  trash:  {bg:'#757575',fg:'#fff',   bd:'#616161'},
+  flour:  {bg:'#5E35B1',fg:'#fff',   bd:'#4527a0'},
+  clean:  {bg:'#00897B',fg:'#fff',   bd:'#00695c'},
+  other:  {bg:'#546E7A',fg:'#fff',   bd:'#37474f'},
+};
+const CN={dist:'เบิกของ',admin:'ธุรการ',measure:'ตวงสูตร',seafood:'ซีฟู้ด',
+  veggie:'ผัก/ดอง',meat:'เนื้อสัตว์',special:'พิเศษ',trash:'ขยะ',flour:'แป้ง/ขนม',clean:'ทำความสะอาด'};
+
+// Avatar colors (Google palette)
+const AV_COLORS=[
+  '#4285F4','#EA4335','#FBBC04','#34A853','#FF6D00',
+  '#46BDC6','#7B61FF','#E91E63','#00BCD4','#FF5722','#9C27B0','#607D8B'
+];
+const PERSON_SVG=`<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+
+const WORKERS=[
+  {n:'แจ็ค',    t:[{s:'08:00',e:'09:00',l:'เบิกของส่งสาขา-สด',c:'dist'},{s:'11:00',e:'11:30',l:'งานธุรการ',c:'admin'},{s:'16:30',e:'17:00',l:'ตวงสูตร // สด',c:'admin'}]},
+  {n:'โอเล่',   t:[{s:'08:00',e:'09:30',l:'เบิกของส่งสาขา-แห้ง',c:'dist'},{s:'09:30',e:'12:00',l:'งานธุรการ',c:'admin'},{s:'15:30',e:'17:00',l:'เบิกโรงแกง ไก่ทอด ขนมจีน',c:'special'}]},
+  {n:'ป้าน้อย', t:[{s:'08:00',e:'09:00',l:'เบิกของส่งสาขา-ผัก',c:'dist'},{s:'09:00',e:'10:30',l:'ปลาหมึกไข่ 8-12 ตัว // 20 กก.',c:'seafood'},{s:'14:30',e:'16:00',l:'กุ้ง 120 ตัว/กก. (Repack) // 20 กก.',c:'seafood'},{s:'16:00',e:'17:00',l:'ทำความสะอาด ห้องซีฟู้ด',c:'clean'}]},
+  {n:'เอ (A)',  t:[{s:'08:00',e:'09:00',l:'เบิกของส่งสาขา-ผัก',c:'dist'},{s:'09:00',e:'10:30',l:'ปลาหมึกไข่ 8-12 ตัว // 20 กก.',c:'seafood'},{s:'14:30',e:'16:00',l:'กุ้ง 120 ตัว/กก. (Repack) // 20 กก.',c:'seafood'},{s:'16:00',e:'16:30',l:'เก็บขยะ',c:'trash'}]},
+  {n:'เบียร์',  t:[{s:'08:00',e:'09:30',l:'ปลาหมึกไข่ 8-12 ตัว // 20 กก.',c:'seafood'},{s:'14:30',e:'15:30',l:'ผักกาดขาวดองบีบน้ำเกลือ',c:'veggie'},{s:'15:30',e:'17:00',l:'ทำความสะอาด ห้องซีฟู้ด',c:'clean'}]},
+  {n:'พี่ภา',   t:[{s:'08:00',e:'09:30',l:'ตวงสูตร - เครื่องปรุง',c:'measure'},{s:'10:30',e:'12:00',l:'น้ำยากะทิ 2 หม้อ',c:'seafood'},{s:'16:30',e:'17:00',l:'ตวงสูตร - เครื่องปรุง',c:'measure'}]},
+  {n:'บอล',    t:[{s:'08:00',e:'09:00',l:'เบิกของส่งสาขา-สด',c:'dist'},{s:'09:00',e:'12:30',l:'ผักกาดขาวดองบีบน้ำเกลือ',c:'veggie'},{s:'13:15',e:'14:30',l:'แป้งข้าวเหนียวกวน',c:'flour'},{s:'16:30',e:'17:00',l:'ทำความสะอาดห้อง marinite',c:'clean'}]},
+  {n:'แมน',    t:[{s:'08:00',e:'09:30',l:'ลาบหมูนึ่ง 6 ชิ้น (40 กรัม/ชิ้น)',c:'meat'},{s:'11:30',e:'12:30',l:'ลูกรอก',c:'admin'},{s:'13:15',e:'14:00',l:'น้ำส้มดำไทย',c:'admin'},{s:'15:00',e:'16:30',l:'ตุ่น แข่น้ำ สามชั้นชาชู 12ม้วน',c:'admin'},{s:'16:30',e:'17:00',l:'ทำความสะอาดครัว A',c:'clean'}]},
+  {n:'หน่อย',  t:[{s:'08:00',e:'09:00',l:'ตวงสูตร ผัก',c:'measure'},{s:'09:00',e:'10:30',l:'ลาบหมูนึ่ง 6 ชิ้น (40 กรัม/ชิ้น)',c:'meat'},{s:'11:00',e:'12:30',l:'น้ำจิ้มซีฟู้ด-กุ้งแช่น้ำปลา 1 กก.',c:'seafood'},{s:'16:30',e:'17:00',l:'ตวงสูตร ผัก',c:'measure'}]},
+  {n:'สาม',    t:[{s:'08:00',e:'09:00',l:'ตุ่น แข่น้ำ สามชั้นชาชู 12ม้วน',c:'admin'},{s:'16:30',e:'17:00',l:'ทำความสะอาดครัว A',c:'clean'}]},
+  {n:'พี่ตุ่น', t:[{s:'08:00',e:'09:00',l:'ชปเคล 240 กรัม // 50 แพ็ค',c:'other'},{s:'11:30',e:'13:15',l:'ซุปข้าวโพด 240 กรัม // 50 แพ็ค',c:'seafood'},{s:'16:30',e:'17:00',l:'ทำความสะอาดครัว B',c:'clean'}]},
+  {n:'จรัญ',   t:[{s:'08:00',e:'08:30',l:'แป้งไก่มะนาว',c:'flour'},{s:'08:30',e:'09:30',l:'แป้งผสมทะเลทอด',c:'flour'},{s:'11:30',e:'13:15',l:'แป้งผสมไก่เหนียว',c:'flour'},{s:'13:15',e:'14:30',l:'แป้งไก่-เหนียว 110 กรัม (1x10 ถุง)',c:'flour'}]},
+];
+const LG=[
+  {k:'dist',n:'เบิกของ/ส่งสาขา'},{k:'admin',n:'งานธุรการ'},{k:'measure',n:'ตวงสูตร'},
+  {k:'seafood',n:'ซีฟู้ด/อาหาร'},{k:'veggie',n:'ผัก/ดอง'},{k:'meat',n:'เนื้อสัตว์'},
+  {k:'special',n:'งานพิเศษ'},{k:'flour',n:'แป้ง/ขนม'},{k:'clean',n:'ทำความสะอาด'},
+];
+
+let SCALE=2;
+function tL(m){return(m-DAY_START)*SCALE;}
+function xToMin(x){return DAY_START+x/SCALE;}
+
+// ─── Drag & Popover state ───
+let drag=null, ghostEl=null, outHandler=null;
+
+function closePopover(){
+  const p=document.getElementById('apop');
+  if(p)p.remove();
+  if(ghostEl){ghostEl.remove();ghostEl=null;}
+  if(outHandler){document.removeEventListener('mousedown',outHandler);outHandler=null;}
+}
+
+function showPopover(workerIdx, sMin, eMin, anchorRect){
+  closePopover();
+  const w=WORKERS[workerIdx];
+  const avColor=AV_COLORS[workerIdx%AV_COLORS.length];
+  const catKeys=Object.keys(C).filter(k=>k!=='other');
+
+  function validate(s,e){
+    const brk=s<BREAK_E&&e>BREAK_S;
+    const ovlp=w.t.some(tk=>{const ts=toMin(tk.s),te=toMin(tk.e);return s<te&&e>ts;});
+    return{brk,ovlp};
+  }
+
+  const catHtml=catKeys.map((k,i)=>{
+    const v=C[k];
+    return `<button class="apop-cat${i===0?' apop-cat-sel':''}" data-k="${k}"
+      style="--cb:${v.bd};--cg:${v.bg};--cf:${v.fg}">${CN[k]||k}</button>`;
+  }).join('');
+
+  const pop=document.createElement('div');
+  pop.id='apop';
+  pop.innerHTML=`
+    <div class="apop-stripe"></div>
+    <div class="apop-body">
+      <div class="apop-hdr">
+        <div class="apop-who">
+          <div class="apop-avatar" style="background:${avColor}">${PERSON_SVG}</div>
+          ${w.n}
+        </div>
+        <button class="apop-x" title="ปิด">✕</button>
+      </div>
+      <div class="apop-times">
+        <div class="t-spin">
+          <input class="t-part" id="apop-sh" type="number" min="0" max="23" value="${Math.floor(sMin/60)}">
+          <span class="t-colon">:</span>
+          <input class="t-part" id="apop-sm" type="number" min="0" max="59" value="${sMin%60}">
+        </div>
+        <span class="apop-tsep">–</span>
+        <div class="t-spin">
+          <input class="t-part" id="apop-eh" type="number" min="0" max="23" value="${Math.floor(eMin/60)}">
+          <span class="t-colon">:</span>
+          <input class="t-part" id="apop-em" type="number" min="0" max="59" value="${eMin%60}">
+        </div>
+      </div>
+      <div id="apop-warns"></div>
+      <input class="apop-name" id="apop-n" type="text" placeholder="ชื่องาน / เมนู / Batch No." autocomplete="off">
+      <div>
+        <div class="apop-cat-lbl" style="margin-bottom:7px;">ประเภทงาน</div>
+        <div class="apop-cats">${catHtml}</div>
+      </div>
+      <div class="apop-footer">
+        <button class="apop-cancel">ยกเลิก</button>
+        <button class="apop-save">สร้าง</button>
+      </div>
+    </div>`;
+  document.body.appendChild(pop);
+
+  function updateWarns(s,e){
+    const v=validate(s,e);
+    let h='';
+    if(v.brk) h+=`<div class="apop-warn warn-brk">🚫 คร่อมพักเบรก 12:30–13:15</div>`;
+    if(v.ovlp) h+=`<div class="apop-warn warn-ovlp">⚠️ ทับซ้อนกับงานที่มีอยู่</div>`;
+    document.getElementById('apop-warns').innerHTML=h;
+  }
+  updateWarns(sMin,eMin);
+
+  // Position
+  const pw=300, ph=390;
+  let px=anchorRect.left+anchorRect.width/2-pw/2;
+  px=Math.max(12,Math.min(px,window.innerWidth-pw-12));
+  let py=anchorRect.top-ph-14;
+  if(py<68) py=anchorRect.bottom+10;
+  py=Math.min(py,window.innerHeight-ph-12);
+  pop.style.left=px+'px';
+  pop.style.top=py+'px';
+
+  function readSpin(hId,mId){
+    const h=Math.min(23,Math.max(0,parseInt(document.getElementById(hId).value)||0));
+    const m=Math.min(59,Math.max(0,parseInt(document.getElementById(mId).value)||0));
+    return h*60+m;
+  }
+
+  ['apop-sh','apop-sm','apop-eh','apop-em'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('blur',()=>{
+      const max=id.endsWith('h')?23:59;
+      el.value=Math.min(max,Math.max(0,parseInt(el.value)||0));
+    });
+    el.addEventListener('input',()=>updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em')));
+  });
+
+  // Cat selection
+  let selCat=catKeys[0];
+  pop.querySelectorAll('.apop-cat').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      pop.querySelectorAll('.apop-cat').forEach(b=>b.classList.remove('apop-cat-sel'));
+      btn.classList.add('apop-cat-sel');
+      selCat=btn.dataset.k;
+    });
+  });
+
+  function doSave(){
+    const name=document.getElementById('apop-n').value.trim();
+    if(!name){
+      const n=document.getElementById('apop-n');
+      n.classList.add('apop-err');n.focus();
+      setTimeout(()=>n.classList.remove('apop-err'),400);
+      return;
+    }
+    const s=readSpin('apop-sh','apop-sm');
+    const e=readSpin('apop-eh','apop-em');
+    if(e<=s)return;
+    w.t.push({s:minToTime(s),e:minToTime(e),l:name,c:selCat});
+    closePopover();build();
+  }
+
+  pop.querySelector('.apop-save').addEventListener('click',doSave);
+  pop.querySelector('.apop-cancel').addEventListener('click',closePopover);
+  pop.querySelector('.apop-x').addEventListener('click',closePopover);
+  document.getElementById('apop-n').addEventListener('keydown',e=>{
+    if(e.key==='Enter')doSave();
+    if(e.key==='Escape')closePopover();
+  });
+
+  setTimeout(()=>{
+    outHandler=e=>{if(!pop.contains(e.target))closePopover();};
+    document.addEventListener('mousedown',outHandler);
+  },120);
+
+  document.getElementById('apop-n').focus();
+}
+
+// ─── Build ───
+function build(){
+  if(drag)drag=null;
+  closePopover();
+
+  const gs=document.getElementById('gs');
+  const avail=Math.max(gs.clientWidth-NAME_W,640);
+  SCALE=avail/TOTAL;
+  const TW=TOTAL*SCALE;
+  const bL=(BREAK_S-DAY_START)*SCALE, bW=(BREAK_E-BREAK_S)*SCALE;
+  const tW=(s,e)=>Math.max((toMin(e)-toMin(s))*SCALE-2,6);
+
+  // Time header
+  let ticks='';
+  for(let m=0;m<=TOTAL;m+=30){
+    const a=DAY_START+m,h=Math.floor(a/60),mn=a%60;
+    ticks+=`<div class="tick" style="left:${m*SCALE}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
+  }
+  document.getElementById('th-inner').style.width=TW+'px';
+  document.getElementById('th-inner').innerHTML=
+    ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>BREAK</span></div>`;
+
+  // Rows
+  const tip=document.getElementById('tip');
+  let count=0;
+  const html=WORKERS.map((w,wi)=>{
+    count+=w.t.length;
+    const avColor=AV_COLORS[wi%AV_COLORS.length];
+    const tasks=w.t.map(tk=>{
+      const col=C[tk.c]||C.other;
+      const l=tL(toMin(tk.s)), ww=tW(tk.s,tk.e);
+      return `<div class="task" style="left:${l}px;width:${ww}px;background:${col.bg};"
+        data-tip="${w.n}\n${tk.s} – ${tk.e}\n${tk.l}">
+        <span style="color:${col.fg}">${tk.l}</span>
+      </div>`;
+    }).join('');
+    return `<div class="row">
+      <div class="row-name">
+        <div class="avatar" style="background:${avColor}">${PERSON_SVG}</div>
+        <span class="row-name-text">${w.n}</span>
+      </div>
+      <div class="task-area" style="width:${TW}px">
+        <div class="brk-col" style="left:${bL}px;width:${bW}px"></div>
+        ${tasks}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('gi').innerHTML=html;
+  document.getElementById('sv-t').textContent=count;
+
+  // Tooltip
+  document.querySelectorAll('.task').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{tip.textContent=el.dataset.tip;tip.style.display='block';});
+    el.addEventListener('mousemove',e=>{
+      tip.style.left=Math.min(e.clientX+14,window.innerWidth-270)+'px';
+      tip.style.top=Math.max(e.clientY-60,8)+'px';
+    });
+    el.addEventListener('mouseleave',()=>{tip.style.display='none';});
+  });
+
+  // Drag-to-create
+  document.querySelectorAll('.task-area').forEach((area,idx)=>{
+    area.addEventListener('mousedown',e=>{
+      if(e.button!==0||e.target.closest('.task,.brk-col'))return;
+      e.preventDefault();
+      const rect=area.getBoundingClientRect();
+      const sMin=clamp(snap(xToMin(e.clientX-rect.left)));
+      const eMin=clamp(sMin+60);
+      const ghost=document.createElement('div');
+      ghost.className='ghost-task';
+      ghost.innerHTML=`<span>${minToTime(sMin)} – ${minToTime(eMin)}</span>`;
+      ghost.style.left=tL(sMin)+'px';
+      ghost.style.width=(tL(eMin)-tL(sMin))+'px';
+      area.appendChild(ghost);
+      ghostEl=ghost;
+      drag={workerIdx:idx,area,sMin,curMin:eMin,ghost,x0:e.clientX};
+    });
+  });
+}
+
+// ─── Document events ───
+document.addEventListener('mousemove',e=>{
+  if(!drag)return;
+  const rect=drag.area.getBoundingClientRect();
+  const curMin=clamp(snap(Math.max(drag.sMin+15,xToMin(e.clientX-rect.left))));
+  drag.curMin=curMin;
+  drag.ghost.style.width=Math.max(tL(curMin)-tL(drag.sMin),6)+'px';
+  drag.ghost.querySelector('span').textContent=`${minToTime(drag.sMin)} – ${minToTime(curMin)}`;
+});
+
+document.addEventListener('mouseup',e=>{
+  if(!drag)return;
+  const d=drag;drag=null;
+  const ghostRect=d.ghost.getBoundingClientRect();
+  showPopover(d.workerIdx,d.sMin,d.curMin,ghostRect);
+});
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePopover();});
+
+// Scroll sync
+function syncHeader(){
+  document.getElementById('th-inner').style.transform=
+    `translateX(-${document.getElementById('gs').scrollLeft}px)`;
+}
+document.getElementById('gs').addEventListener('scroll',syncHeader);
+
+// Legend
+document.getElementById('legend').innerHTML=
+  LG.map(l=>`<div class="lg-item"><div class="lg-dot" style="background:${C[l.k].bd}"></div><span>${l.n}</span></div>`).join('')+
+  `<div style="flex:1"></div><span style="font-size:11px;color:var(--text-3);font-weight:500;">📅 จ–ส · 6 วัน/สัปดาห์</span>`;
+
+build();
+let rt;
+window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(build,150);});
+</script>
