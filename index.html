@@ -544,6 +544,8 @@ function build(){
     const h=Math.floor(a/60),mn=a%60;
     ticks+=`<div class="tick" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
   }
+  // add 13:15 tick (break end, not on 30-min boundary)
+  ticks+=`<div class="tick" style="left:${tL(BREAK_E)}px"><span>13:15</span></div>`;
   document.getElementById('th-inner').style.width=(TW+40)+'px';
   document.getElementById('th-inner').innerHTML=
     ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`;
@@ -561,11 +563,14 @@ function build(){
       const isHour=a%60===0;
       gridLines+=`<div class="vgrid${isHour?' vgrid-hour':''}" style="left:${tL(a)}px"></div>`;
     }
+    // gridline at break end (13:15)
+    gridLines+=`<div class="vgrid vgrid-hour" style="left:${tL(BREAK_E)}px"></div>`;
     const tasks=w.t.map(tk=>{
       const col=C[tk.c]||C.other;
       const l=tL(toMin(tk.s));
       const r=TW+40-tL(toMin(tk.e));
-      return `<div class="task" style="left:${l}px;right:${r}px;background:${col.bg};"
+      const atEnd=toMin(tk.e)===DAY_END;
+      return `<div class="task" style="left:${l}px;right:${r}px;background:${col.bg};${atEnd?'border-radius:6px 0 0 6px;':''}"
         data-tip="${w.n}\n${tk.s} – ${tk.e}\n${tk.l}">
         <span style="color:${col.fg}">${tk.l}</span>
       </div>`;
