@@ -524,7 +524,6 @@ function build(){
   SCALE=(avail+60)/TOTAL;
   const TW=TOTAL*SCALE;
   const bL=(BREAK_S-DAY_START)*SCALE, bW=(BREAK_E-BREAK_S)*SCALE;
-  const tW=(s,e)=>Math.max((toMin(e)-toMin(s))*SCALE-2,6);
 
   // Time header
   let ticks='';
@@ -549,8 +548,9 @@ function build(){
     }
     const tasks=w.t.map(tk=>{
       const col=C[tk.c]||C.other;
-      const l=tL(toMin(tk.s)), ww=tW(tk.s,tk.e);
-      return `<div class="task" style="left:${l}px;width:${ww}px;background:${col.bg};"
+      const l=tL(toMin(tk.s));
+      const r=TW+40-tL(toMin(tk.e));
+      return `<div class="task" style="left:${l}px;right:${r}px;background:${col.bg};"
         data-tip="${w.n}\n${tk.s} – ${tk.e}\n${tk.l}">
         <span style="color:${col.fg}">${tk.l}</span>
       </div>`;
