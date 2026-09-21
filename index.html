@@ -17,6 +17,7 @@
   --accent-dk: #1557b0;
   --red: #d93025;
   --yellow: #b06000;
+  --topbar-h: 48px;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -27,39 +28,39 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   position:sticky;top:env(safe-area-inset-top,0px);z-index:60;
   background:var(--surface);
   box-shadow:0 1px 3px rgba(60,64,67,.25),0 2px 8px 2px rgba(60,64,67,.1);
-  display:flex;align-items:center;gap:8px;padding:0 16px;height:64px;
+  display:flex;align-items:center;gap:8px;padding:0 12px;height:var(--topbar-h);
 }
-.logo-wrap{display:flex;align-items:center;gap:12px;margin-right:8px;}
-.logo-svg{width:40px;height:40px;flex-shrink:0;}
-.app-title{font-size:18px;font-weight:400;color:var(--text-2);white-space:nowrap;letter-spacing:-.3px;}
-.app-title b{color:var(--text);font-weight:600;}
+.logo-wrap{display:flex;align-items:center;gap:8px;margin-right:4px;}
+.logo-svg{width:28px;height:28px;flex-shrink:0;}
+.app-title{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;letter-spacing:-.3px;}
 .topbar-gap{flex:1;}
-.date-chip{font-size:13px;font-weight:500;color:var(--text-2);white-space:nowrap;padding:0 4px;}
+.date-chip{font-size:12px;font-weight:500;color:var(--text-2);white-space:nowrap;padding:0 4px;}
 .brk-chip{
   display:flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:500;color:var(--text-3);
+  font-size:11px;font-weight:500;color:var(--text-3);
   background:var(--sf-dim);border:1px solid var(--border);
-  border-radius:20px;padding:5px 12px;white-space:nowrap;
+  border-radius:16px;padding:3px 8px;white-space:nowrap;
 }
-.brk-chip-dot{width:7px;height:7px;border-radius:50%;background:#bdc1c6;flex-shrink:0;}
+.brk-chip-dot{width:6px;height:6px;border-radius:50%;background:#bdc1c6;flex-shrink:0;}
 .btn-create{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:4px;
   background:var(--accent);color:#fff;
-  border:none;border-radius:24px;
-  padding:10px 22px;font-size:14px;font-weight:600;
+  border:none;border-radius:16px;
+  padding:5px 12px;font-size:12px;font-weight:600;
   cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;white-space:nowrap;
-  box-shadow:0 1px 2px rgba(60,64,67,.25),0 1px 3px 1px rgba(60,64,67,.12);
+  box-shadow:0 1px 2px rgba(60,64,67,.25);
   transition:background .15s,box-shadow .15s;
 }
 .btn-create:hover{
   background:var(--accent-dk);
-  box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.18);
+  box-shadow:0 1px 3px rgba(60,64,67,.3);
 }
+.btn-create svg{width:16px;height:16px;}
 
 /* ─── Time header ─── */
 .th-band{
   position:sticky;
-  top:calc(64px + env(safe-area-inset-top,0px));
+  top:calc(var(--topbar-h) + env(safe-area-inset-top,0px));
   z-index:50;
   background:var(--surface);
   border-bottom:1px solid var(--border);
@@ -79,21 +80,23 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 .th-axis-clip{flex:1;overflow:hidden;position:relative;}
 .th-axis-inner{position:relative;height:100%;}
 .tick{
-  position:absolute;top:0;bottom:0;z-index:2;
-  display:flex;align-items:center;padding-left:6px;
+  position:absolute;top:0;bottom:0;z-index:1;
   border-left:1px solid var(--border);
-  pointer-events:none;
+  pointer-events:none;width:0;
 }
-.tick span{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10.5px;color:var(--text-2);font-weight:600;white-space:nowrap;
-}
-/* 17:00: line + label on the last pixel of the grid */
 .tick.tick-end{
-  left:auto;right:0;padding-left:0;padding-right:4px;
-  border-left:none;border-right:1px solid var(--border);
-  justify-content:flex-end;
+  left:auto;right:0;border-left:none;border-right:1px solid var(--border);
 }
+.slot{
+  position:absolute;top:0;bottom:0;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;pointer-events:none;padding:0 2px;line-height:1.15;
+}
+.slot span{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9.5px;color:var(--text-2);font-weight:600;white-space:nowrap;
+}
+.slot .slot-dash{font-size:7.5px;line-height:1;opacity:.65;font-weight:500;}
 .brk-th{
   position:absolute;top:0;bottom:0;overflow:hidden;z-index:1;
   background:#fef3f2;
@@ -170,12 +173,15 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   position:absolute;top:6px;bottom:6px;
   background:var(--accent-lt);border:1.5px solid var(--accent);
   border-radius:8px;pointer-events:none;z-index:8;
-  display:flex;align-items:center;padding-left:9px;opacity:.85;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 3px;overflow:hidden;opacity:.85;line-height:1.15;
 }
+.ghost-task.ghost-hover{opacity:.78;}
 .ghost-task span{
-  font-size:10.5px;font-weight:600;color:var(--accent);
+  font-size:10px;font-weight:600;color:var(--accent);
   white-space:nowrap;font-family:'IBM Plex Mono',monospace;
 }
+.ghost-task .slot-dash{font-size:7.5px;line-height:1;opacity:.7;font-weight:500;}
 
 /* ─── Add Popover ─── */
 #apop{
@@ -205,11 +211,10 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 }
 .t-spin:focus-within{border-color:var(--accent);}
 .t-part{
-  width:26px;border:none;background:transparent;outline:none;
+  width:28px;border:none;background:transparent;outline:none;
   font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;
-  color:var(--text);text-align:center;padding:0;-moz-appearance:textfield;
+  color:var(--text);text-align:center;padding:0;letter-spacing:.02em;
 }
-.t-part::-webkit-inner-spin-button,.t-part::-webkit-outer-spin-button{-webkit-appearance:none;}
 .t-colon{color:var(--text-2);font-size:14px;font-weight:600;font-family:'IBM Plex Mono',monospace;user-select:none;}
 .apop-tsep{color:var(--text-3);font-size:13px;flex-shrink:0;}
 .apop-warn{font-size:12px;padding:8px 12px;border-radius:8px;font-weight:500;line-height:1.45;}
@@ -249,23 +254,6 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 }
 .apop-save:hover{background:var(--accent-dk);}
 
-/* ─── Legend & Stats ─── */
-.legend-bar{
-  background:var(--surface);border-top:1px solid var(--border);
-  padding:10px 20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;
-}
-.lg-item{display:flex;align-items:center;gap:6px;}
-.lg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
-.lg-item span{font-size:11px;color:var(--text-2);font-weight:500;}
-.stats-bar{
-  background:var(--surface);border-top:1px solid var(--border);
-  display:flex;justify-content:space-around;padding:14px 20px;
-}
-.stat .val{
-  font-size:22px;font-weight:700;color:var(--accent);line-height:1;
-  font-variant-numeric:tabular-nums;font-family:'IBM Plex Mono',monospace;
-}
-.stat .lbl{font-size:11px;color:var(--text-3);margin-top:3px;text-align:center;font-weight:500;}
 #tip{
   position:fixed;z-index:200;pointer-events:none;display:none;
   background:#3c4043;color:#fff;font-size:12px;line-height:1.5;
@@ -289,7 +277,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
       <rect x="17.5" y="25" width="5" height="5" rx="1" fill="#fbbc04"/>
       <rect x="25" y="25" width="5" height="5" rx="1" fill="#34a853"/>
     </svg>
-    <span class="app-title"><b>ตารางผลิต</b> ครัวกลาง</span>
+    <span class="app-title">ตารางผลิตครัวกลาง</span>
   </div>
   <div class="topbar-gap"></div>
   <span class="date-chip">กันยายน 2569 · 08:00–17:00</span>
@@ -298,10 +286,10 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
     พักเบรก 12:30–13:15
   </div>
   <button class="btn-create" id="btn-create">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
     </svg>
-    สร้าง
+    เพิ่มงาน
   </button>
 </div>
 
@@ -318,18 +306,6 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   <div class="grid-inner" id="gi"></div>
 </div>
 
-<!-- Legend -->
-<div class="legend-bar" id="legend"></div>
-
-<!-- Stats -->
-<div class="stats-bar">
-  <div class="stat"><div class="val" id="sv-w">12</div><div class="lbl">ผู้ปฏิบัติงาน</div></div>
-  <div class="stat"><div class="val" id="sv-t">–</div><div class="lbl">งานทั้งหมด</div></div>
-  <div class="stat"><div class="val">9h</div><div class="lbl">ชั่วโมงทำการ</div></div>
-  <div class="stat"><div class="val">45m</div><div class="lbl">ช่วงพักเบรก</div></div>
-  <div class="stat"><div class="val">6 วัน</div><div class="lbl">ต่อสัปดาห์</div></div>
-</div>
-
 <div id="tip"></div>
 
 <script>
@@ -339,6 +315,7 @@ const NAME_W=88;
 
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minToTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
+function pad2(n){return String(n).padStart(2,'0');}
 function snap(m,step=15){return Math.round(m/step)*step;}
 function clamp(m){return Math.max(DAY_START,Math.min(m,DAY_END));}
 
@@ -377,11 +354,6 @@ const WORKERS=[
   {n:'พี่ตุ่น', t:[{s:'08:00',e:'09:00',l:'ชปเคล 240 กรัม // 50 แพ็ค',c:'other'},{s:'11:30',e:'13:15',l:'ซุปข้าวโพด 240 กรัม // 50 แพ็ค',c:'seafood'},{s:'16:30',e:'17:00',l:'ทำความสะอาดครัว B',c:'clean'}]},
   {n:'จรัญ',   t:[{s:'08:00',e:'08:30',l:'แป้งไก่มะนาว',c:'flour'},{s:'08:30',e:'09:30',l:'แป้งผสมทะเลทอด',c:'flour'},{s:'11:30',e:'13:15',l:'แป้งผสมไก่เหนียว',c:'flour'},{s:'13:15',e:'14:30',l:'แป้งไก่-เหนียว 110 กรัม (1x10 ถุง)',c:'flour'}]},
 ];
-const LG=[
-  {k:'dist',n:'เบิกของ/ส่งสาขา'},{k:'admin',n:'งานธุรการ'},{k:'measure',n:'ตวงสูตร'},
-  {k:'seafood',n:'ซีฟู้ด/อาหาร'},{k:'veggie',n:'ผัก/ดอง'},{k:'meat',n:'เนื้อสัตว์'},
-  {k:'special',n:'งานพิเศษ'},{k:'flour',n:'แป้ง/ขนม'},{k:'clean',n:'ทำความสะอาด'},
-];
 
 let SCALE=2, OFFSET=0, lastFit=-1;
 const BRK_VIS=58; // visual px for break zone (fits 12:30 / 13:15)
@@ -396,14 +368,44 @@ function xToMin(x){
   if(x>=bx+BRK_VIS) return BREAK_E+(x-bx-BRK_VIS)/SCALE;
   return BREAK_S+(x-bx)/BRK_VIS*(BREAK_E-BREAK_S);
 }
+function slotAt(m){
+  if(m<DAY_START||m>=DAY_END) return null;
+  if(m>=BREAK_S&&m<BREAK_E) return null;
+  if(m<BREAK_S){
+    const s=DAY_START+Math.floor((m-DAY_START)/30)*30;
+    return{s,e:Math.min(s+30,BREAK_S)};
+  }
+  if(m<14*60) return{s:BREAK_E,e:14*60};
+  const s=14*60+Math.floor((m-14*60)/30)*30;
+  return{s,e:Math.min(s+30,DAY_END)};
+}
 
 // ─── Drag & Popover state ───
-let drag=null, ghostEl=null, outHandler=null;
+let drag=null, ghostEl=null, outHandler=null, hoverGhost=null;
+
+function hideHoverGhost(){
+  if(hoverGhost){hoverGhost.remove();hoverGhost=null;}
+}
+function ghostLabel(s,e){
+  return`<span>${minToTime(s)}</span><span class="slot-dash">–</span><span>${minToTime(e)}</span>`;
+}
+function showHoverSlot(area,s,e){
+  if(!hoverGhost||hoverGhost.parentNode!==area){
+    hideHoverGhost();
+    hoverGhost=document.createElement('div');
+    hoverGhost.className='ghost-task ghost-hover';
+    area.appendChild(hoverGhost);
+  }
+  hoverGhost.style.left=tL(s)+'px';
+  hoverGhost.style.width=Math.max(tL(e)-tL(s),6)+'px';
+  hoverGhost.innerHTML=ghostLabel(s,e);
+}
 
 function closePopover(){
   const p=document.getElementById('apop');
   if(p)p.remove();
   if(ghostEl){ghostEl.remove();ghostEl=null;}
+  hideHoverGhost();
   if(outHandler){document.removeEventListener('mousedown',outHandler);outHandler=null;}
 }
 
@@ -439,15 +441,15 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
       </div>
       <div class="apop-times">
         <div class="t-spin">
-          <input class="t-part" id="apop-sh" type="number" min="0" max="23" value="${Math.floor(sMin/60)}">
+          <input class="t-part" id="apop-sh" type="text" inputmode="numeric" maxlength="2" value="${pad2(Math.floor(sMin/60))}">
           <span class="t-colon">:</span>
-          <input class="t-part" id="apop-sm" type="number" min="0" max="59" value="${sMin%60}">
+          <input class="t-part" id="apop-sm" type="text" inputmode="numeric" maxlength="2" value="${pad2(sMin%60)}">
         </div>
         <span class="apop-tsep">–</span>
         <div class="t-spin">
-          <input class="t-part" id="apop-eh" type="number" min="0" max="23" value="${Math.floor(eMin/60)}">
+          <input class="t-part" id="apop-eh" type="text" inputmode="numeric" maxlength="2" value="${pad2(Math.floor(eMin/60))}">
           <span class="t-colon">:</span>
-          <input class="t-part" id="apop-em" type="number" min="0" max="59" value="${eMin%60}">
+          <input class="t-part" id="apop-em" type="text" inputmode="numeric" maxlength="2" value="${pad2(eMin%60)}">
         </div>
       </div>
       <div id="apop-warns"></div>
@@ -477,7 +479,7 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   let px=anchorRect.left+anchorRect.width/2-pw/2;
   px=Math.max(12,Math.min(px,window.innerWidth-pw-12));
   let py=anchorRect.top-ph-14;
-  if(py<68) py=anchorRect.bottom+10;
+  if(py<52) py=anchorRect.bottom+10;
   py=Math.min(py,window.innerHeight-ph-12);
   pop.style.left=px+'px';
   pop.style.top=py+'px';
@@ -490,11 +492,14 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
 
   ['apop-sh','apop-sm','apop-eh','apop-em'].forEach(id=>{
     const el=document.getElementById(id);
+    el.addEventListener('input',()=>{
+      el.value=el.value.replace(/\D/g,'').slice(0,2);
+      updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em'));
+    });
     el.addEventListener('blur',()=>{
       const max=id.endsWith('h')?23:59;
-      el.value=Math.min(max,Math.max(0,parseInt(el.value)||0));
+      el.value=pad2(Math.min(max,Math.max(0,parseInt(el.value,10)||0)));
     });
-    el.addEventListener('input',()=>updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em')));
   });
 
   // Cat selection
@@ -551,40 +556,40 @@ function build(){
   const bL=tL(BREAK_S), bW=BRK_VIS;
 
   function tickLabel(a){
-    return`${String(Math.floor(a/60)).padStart(2,'0')}:${String(a%60).padStart(2,'0')}`;
+    return`${Math.floor(a/60)}:${String(a%60).padStart(2,'0')}`;
+  }
+  function slotHtml(s,e){
+    const x=tL(s), w=Math.max(0,tL(e)-x);
+    return `<div class="slot" style="left:${x}px;width:${w}px"><span>${tickLabel(s)}</span><span class="slot-dash">–</span><span>${tickLabel(e)}</span></div>`;
   }
 
-  // Time header: label sits in the cell to the right of each tick.
-  // 12:30 is the break-band caption so it stays visible.
-  // 17:00 is pinned to the right edge of the same grid the tasks use.
+  // Interval header: 8:00–8:30 … 12:00–12:30, break 12:30–13:15,
+  // then 13:15–14:00, 14:00–14:30 … 16:30–17:00
   let ticks='';
-  const lastSlot=tL(DAY_END)-tL(DAY_END-30);
-  const show1630=lastSlot>=72;
   for(let m=0;m<=TOTAL;m+=30){
     const a=DAY_START+m;
     if(a>BREAK_S&&a<BREAK_E) continue;
     if(a===DAY_END){
-      ticks+=`<div class="tick tick-end"><span>17:00</span></div>`;
+      ticks+=`<div class="tick tick-end"></div>`;
       continue;
     }
-    if(a===BREAK_S){
-      ticks+=`<div class="tick" style="left:${tL(a)}px"></div>`;
-      continue;
-    }
-    const label=(a===DAY_END-30&&!show1630)?'':tickLabel(a);
-    ticks+=`<div class="tick" style="left:${tL(a)}px">${label?`<span>${label}</span>`:''}</div>`;
+    ticks+=`<div class="tick" style="left:${tL(a)}px"></div>`;
   }
   ticks+=`<div class="tick" style="left:${tL(BREAK_E)}px"></div>`;
+
+  let slots='';
+  for(let m=DAY_START;m<BREAK_S;m+=30) slots+=slotHtml(m,m+30);
+  slots+=slotHtml(BREAK_E,14*60);
+  for(let m=14*60;m<DAY_END;m+=30) slots+=slotHtml(m,m+30);
+
   document.getElementById('th-inner').style.width=TW+'px';
   document.getElementById('th-inner').innerHTML=
-    ticks+
+    ticks+slots+
     `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>12:30</span><span class="brk-dash">–</span><span>13:15</span></div>`;
 
   // Rows
   const tip=document.getElementById('tip');
-  let count=0;
   const html=WORKERS.map((w,wi)=>{
-    count+=w.t.length;
     const avColor=AV_COLORS[wi%AV_COLORS.length];
     let gridLines='';
     for(let m=0;m<=TOTAL;m+=30){
@@ -621,7 +626,6 @@ function build(){
   }).join('');
 
   document.getElementById('gi').innerHTML=html;
-  document.getElementById('sv-t').textContent=count;
   lastFit=gs.clientWidth;
 
   // Tooltip
@@ -634,17 +638,28 @@ function build(){
     el.addEventListener('mouseleave',()=>{tip.style.display='none';});
   });
 
-  // Drag-to-create
+  // Hover slot preview + drag-to-create
   document.querySelectorAll('.task-area').forEach((area,idx)=>{
+    area.addEventListener('mousemove',e=>{
+      if(drag||document.getElementById('apop'))return;
+      if(e.target.closest('.task,.brk-col')){hideHoverGhost();return;}
+      const rect=area.getBoundingClientRect();
+      const sl=slotAt(xToMin(e.clientX-rect.left));
+      if(!sl){hideHoverGhost();return;}
+      showHoverSlot(area,sl.s,sl.e);
+    });
+    area.addEventListener('mouseleave',hideHoverGhost);
     area.addEventListener('mousedown',e=>{
       if(e.button!==0||e.target.closest('.task,.brk-col'))return;
       e.preventDefault();
       const rect=area.getBoundingClientRect();
-      const sMin=clamp(snap(xToMin(e.clientX-rect.left)));
-      const eMin=clamp(sMin+60);
+      const sl=slotAt(xToMin(e.clientX-rect.left));
+      if(!sl)return;
+      hideHoverGhost();
+      const sMin=sl.s, eMin=sl.e;
       const ghost=document.createElement('div');
       ghost.className='ghost-task';
-      ghost.innerHTML=`<span>${minToTime(sMin)} – ${minToTime(eMin)}</span>`;
+      ghost.innerHTML=ghostLabel(sMin,eMin);
       ghost.style.left=tL(sMin)+'px';
       ghost.style.width=(tL(eMin)-tL(sMin))+'px';
       area.appendChild(ghost);
@@ -661,7 +676,7 @@ document.addEventListener('mousemove',e=>{
   const curMin=clamp(snap(Math.max(drag.sMin+15,xToMin(e.clientX-rect.left))));
   drag.curMin=curMin;
   drag.ghost.style.width=Math.max(tL(curMin)-tL(drag.sMin),6)+'px';
-  drag.ghost.querySelector('span').textContent=`${minToTime(drag.sMin)} – ${minToTime(curMin)}`;
+  drag.ghost.innerHTML=ghostLabel(drag.sMin,curMin);
 });
 
 document.addEventListener('mouseup',e=>{
@@ -679,11 +694,6 @@ function syncHeader(){
     `translateX(-${document.getElementById('gs').scrollLeft}px)`;
 }
 document.getElementById('gs').addEventListener('scroll',syncHeader);
-
-// Legend
-document.getElementById('legend').innerHTML=
-  LG.map(l=>`<div class="lg-item"><div class="lg-dot" style="background:${C[l.k].bd}"></div><span>${l.n}</span></div>`).join('')+
-  `<div style="flex:1"></div><span style="font-size:11px;color:var(--text-3);font-weight:500;">📅 จ–ส · 6 วัน/สัปดาห์</span>`;
 
 build();
 requestAnimationFrame(()=>{lastFit=-1;build();});
