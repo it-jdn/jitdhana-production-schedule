@@ -94,9 +94,8 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   display:flex;align-items:center;justify-content:center;
 }
 .brk-th span{
-  font-size:8.5px;font-weight:600;color:#c5221f;
-  letter-spacing:.07em;font-family:'IBM Plex Mono',monospace;
-  text-transform:uppercase;
+  font-size:9px;font-weight:600;color:#c5221f;
+  letter-spacing:.02em;font-family:'IBM Plex Sans Thai',sans-serif;
 }
 
 /* ─── Grid ─── */
@@ -535,7 +534,7 @@ function build(){
   }
   document.getElementById('th-inner').style.width=TW+'px';
   document.getElementById('th-inner').innerHTML=
-    ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>BREAK</span></div>`;
+    ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`;
 
   // Rows
   const tip=document.getElementById('tip');
