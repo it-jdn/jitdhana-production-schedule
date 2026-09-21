@@ -86,6 +86,12 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   font-family:'IBM Plex Mono',monospace;
   font-size:10.5px;color:var(--text-2);font-weight:600;white-space:nowrap;
 }
+/* 17:00 end-of-day tick: label to the LEFT of the line */
+.tick-last{
+  border-left:none;border-right:1px solid var(--border);
+  padding-left:0;padding-right:6px;
+  transform:translateX(-100%);justify-content:flex-end;
+}
 .brk-th{
   position:absolute;top:0;bottom:0;overflow:hidden;
   background:#fef3f2;
@@ -531,7 +537,7 @@ function build(){
 
   const gs=document.getElementById('gs');
   const NON_BRK=TOTAL-(BREAK_E-BREAK_S); // 495 min of non-break time
-  SCALE=Math.max((gs.clientWidth-NAME_W-BRK_VIS-40)/NON_BRK,1);
+  SCALE=Math.max((gs.clientWidth-NAME_W-BRK_VIS)/NON_BRK,1);
   OFFSET=(BREAK_E-BREAK_S)*SCALE-BRK_VIS;
   const TW=TOTAL*SCALE-OFFSET;
   const bL=(BREAK_S-DAY_START)*SCALE, bW=BRK_VIS;
@@ -542,11 +548,12 @@ function build(){
     const a=DAY_START+m;
     if(a>BREAK_S&&a<BREAK_E) continue;
     const h=Math.floor(a/60),mn=a%60;
-    ticks+=`<div class="tick" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
+    const isLast=a===DAY_END;
+    ticks+=`<div class="tick${isLast?' tick-last':''}" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
   }
-  // add 13:15 tick (break end, not on 30-min boundary)
-  ticks+=`<div class="tick" style="left:${tL(BREAK_E)}px"><span>13:15</span></div>`;
-  document.getElementById('th-inner').style.width=(TW+40)+'px';
+  // break-end tick line only (no label — too close to 13:30)
+  ticks+=`<div class="tick" style="left:${tL(BREAK_E)}px"></div>`;
+  document.getElementById('th-inner').style.width=TW+'px';
   document.getElementById('th-inner').innerHTML=
     ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`;
 
@@ -568,9 +575,8 @@ function build(){
     const tasks=w.t.map(tk=>{
       const col=C[tk.c]||C.other;
       const l=tL(toMin(tk.s));
-      const r=TW+40-tL(toMin(tk.e));
-      const atEnd=toMin(tk.e)===DAY_END;
-      return `<div class="task" style="left:${l}px;right:${r}px;background:${col.bg};${atEnd?'border-radius:6px 0 0 6px;':''}"
+      const r=TW-tL(toMin(tk.e));
+      return `<div class="task" style="left:${l}px;right:${r}px;background:${col.bg};"
         data-tip="${w.n}\n${tk.s} – ${tk.e}\n${tk.l}">
         <span style="color:${col.fg}">${tk.l}</span>
       </div>`;
@@ -580,7 +586,7 @@ function build(){
         <div class="avatar" style="background:${avColor}">${PERSON_SVG}</div>
         <span class="row-name-text">${w.n}</span>
       </div>
-      <div class="task-area" style="width:${TW+40}px">
+      <div class="task-area" style="width:${TW}px">
         ${gridLines}
         <div class="brk-col" style="left:${bL}px;width:${bW}px"></div>
         ${tasks}
