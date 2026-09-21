@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Sarabun:wght@400;500;600;700&display=swap">
-<title>ตารางผู้ปฏิบัติงาน</title>
+<title>ตารางผลิตครัวกลาง · ตามงาน</title>
 <style>
 :root {
   --bg: #fff;
@@ -7,7 +7,7 @@
   --sf-dim: #f8f9fa;
   --sf-hover: #f1f3f4;
   --border: #dadce0;
-  --name-w: 88px;
+  --name-w: 228px;
   --border-s: #bdc1c6;
   --text: #202124;
   --text-2: #5f6368;
@@ -16,7 +16,6 @@
   --accent-lt: #e8f0fe;
   --accent-dk: #1557b0;
   --red: #d93025;
-  --yellow: #b06000;
   --topbar-h: 48px;
   --th-h: 40px;
   --row-h: 44px;
@@ -25,7 +24,6 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--text);}
 
-/* ─── Topbar ─── */
 .topbar{
   position:sticky;top:env(safe-area-inset-top,0px);z-index:60;
   background:var(--surface);
@@ -106,7 +104,6 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 }
 .btn-create svg{width:16px;height:16px;}
 
-/* ─── Time header ─── */
 .th-band{
   position:sticky;
   top:calc(var(--topbar-h) + env(safe-area-inset-top,0px));
@@ -120,7 +117,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
   display:flex;align-items:center;justify-content:flex-start;
-  padding-left:8px;background:var(--surface);
+  padding:0 10px 0 30px;background:var(--surface);
 }
 .th-name-fixed span{
   font-size:9.5px;font-weight:600;color:var(--text-3);
@@ -159,75 +156,85 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 }
 .brk-th .brk-dash{font-size:8px;line-height:1;opacity:.75;font-weight:500;}
 
-/* ─── Grid ─── */
 .grid-scroll{overflow-x:auto;}
 .grid-inner{min-width:max-content;}
-.row{display:flex;height:var(--row-h);border-bottom:1px solid var(--border);}
-.row:last-child{border-bottom:none;}
+.row{display:flex;}
 .row-name{
   width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
-  display:flex;align-items:center;padding:0 6px;gap:6px;
-  background:var(--surface);position:sticky;left:0;z-index:10;
+  border-bottom:1px solid var(--border);
+  border-left:4px solid var(--job-c,#dadce0);
+  display:flex;align-items:center;gap:6px;padding:0 8px 0 6px;
+  background:var(--job-tint,#fff);position:sticky;left:0;z-index:10;
 }
-.avatar{
-  width:22px;height:22px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  font-size:11.5px;font-weight:600;color:#5f6368;line-height:1;
-  font-family:'IBM Plex Sans Thai',sans-serif;
-  background:#fff;box-shadow:inset 0 0 0 1px #dadce0;
+.row-num{
+  flex-shrink:0;min-width:16px;text-align:right;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px;font-weight:600;color:var(--job-c,#5f6368);
 }
 .row-name-text{
-  font-size:12.5px;font-weight:500;color:var(--text);
+  font-family:'Sarabun',sans-serif;
+  font-size:12px;font-weight:600;color:var(--text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  flex:1;min-width:0;
+  min-width:0;flex:1;
 }
 .task-area{
-  position:relative;background:var(--surface);cursor:crosshair;
-  overflow:hidden;flex-shrink:0;
-  box-shadow:inset 1px 0 0 rgba(218,220,224,.7),inset -1px 0 0 rgba(218,220,224,.7);
+  position:relative;background:var(--surface);flex-shrink:0;
+  box-shadow:inset 1px 0 0 rgba(218,220,224,.7),inset -1px 0 0 rgba(218,220,224,.7);overflow:hidden;
 }
-.task-area:hover{background:#f8fbff;}
 .row:nth-child(even) .task-area{background:#fafbff;}
-.row:nth-child(even) .task-area:hover{background:#f3f7ff;}
 .vgrid{
   position:absolute;top:0;bottom:0;width:1px;
   background:rgba(218,220,224,.7);pointer-events:none;z-index:1;
 }
 .vgrid-brk{background:var(--border-s);z-index:7;}
+.hgrid{
+  position:absolute;left:0;right:0;height:1px;
+  background:rgba(218,220,224,.7);pointer-events:none;z-index:1;
+}
+.hgrid-row{background:var(--border);}
 .brk-col{
   position:absolute;top:0;bottom:0;
   background:repeating-linear-gradient(-45deg,transparent,transparent 4px,rgba(0,0,0,.03) 4px,rgba(0,0,0,.03) 8px);
   pointer-events:none;z-index:6;
 }
 .task{
-  position:absolute;top:5px;bottom:5px;
-  border-radius:5px;display:flex;align-items:center;
-  padding:0 8px;cursor:pointer;overflow:hidden;
-  transition:filter .2s,box-shadow .12s,transform .1s,opacity .2s;z-index:4;
-  box-shadow:0 1px 2px rgba(0,0,0,.12);
+  position:absolute;
+  border-radius:4px;display:flex;align-items:center;
+  padding:0 5px;cursor:default;overflow:hidden;
+  z-index:4;box-shadow:0 1px 2px rgba(0,0,0,.12);gap:3px;
+  transition:filter .2s,opacity .2s,box-shadow .2s;
 }
-.task:hover{
-  filter:brightness(.9);
-  box-shadow:0 2px 8px rgba(60,64,67,.28),0 1px 3px rgba(60,64,67,.15);
-  transform:translateY(-1px);
+.task.task-pulse{z-index:7;overflow:visible;}
+.task:hover{filter:brightness(.92);z-index:6;}
+.bar-avs{display:flex;align-items:center;gap:4px;min-width:0;flex:1;overflow:hidden;}
+.bar-who{display:flex;align-items:center;gap:3px;flex:1 1 0;min-width:18px;overflow:hidden;cursor:pointer;border-radius:11px;}
+.bar-who span{
+  font-size:11.5px;font-weight:600;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0;
 }
-.task.task-pulse{
-  outline:2.5px solid #fff;
-  outline-offset:2px;
-  z-index:9;
-  overflow:visible;
-  animation:taskPulse .7s ease-in-out infinite;
-  box-shadow:0 0 0 2px #1a73e8,0 2px 8px rgba(26,115,232,.35);
+.task.no-name .bar-who span{display:none;}
+.task.no-name .bar-who{flex:0 0 auto;min-width:18px;}
+.task.no-name .bar-avs{gap:3px;}
+.who-out{
+  position:absolute;z-index:5;display:flex;align-items:center;gap:5px;
+  pointer-events:none;white-space:nowrap;
+  font-size:11px;font-weight:600;color:#202124;
+  text-shadow:0 0 4px #fff,0 0 4px #fff,1px 0 0 #fff,-1px 0 0 #fff,0 1px 0 #fff;
+  transition:opacity .2s;
 }
-.task.task-pulse:hover{transform:none;filter:none;}
-@keyframes taskPulse{
-  0%,100%{outline-color:#fff;box-shadow:0 0 0 2px #1a73e8,0 2px 10px rgba(26,115,232,.45);}
-  50%{outline-color:rgba(255,255,255,.15);box-shadow:0 0 0 2px rgba(26,115,232,.2),0 1px 3px rgba(26,115,232,.12);}
+.who-out-n{pointer-events:auto;cursor:pointer;border-radius:4px;padding:0 2px;}
+.bar-who.who-pulse,.who-out-n.who-pulse{
+  outline:2px solid #fff;
+  outline-offset:1px;
+  z-index:8;
+  animation:whoPulse .7s ease-in-out infinite;
+  box-shadow:0 0 0 2px #1a73e8;
 }
-@media(prefers-reduced-motion:reduce){
-  .task.task-pulse{animation:none;}
+.bar-who.who-pulse .avatar{box-shadow:inset 0 0 0 1px #dadce0,0 0 0 2px #1a73e8;}
+@keyframes whoPulse{
+  0%,100%{outline-color:#fff;box-shadow:0 0 0 2px #1a73e8;}
+  50%{outline-color:rgba(255,255,255,.15);box-shadow:0 0 0 2px rgba(26,115,232,.22);}
 }
 .grid-inner.is-pulsing .task:not(.task-pulse){
   filter:saturate(.2) brightness(1.22);
@@ -237,28 +244,21 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 .grid-inner.is-pulsing .task:not(.task-pulse):hover{
   filter:saturate(.35) brightness(1.12);
   opacity:.55;
-  transform:none;
 }
-.task span{
-  font-family:'Sarabun',sans-serif;
-  font-size:11.5px;font-weight:500;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+.grid-inner.is-pulsing .who-out:not(.has-pulse){opacity:.34;}
+.row.row-dim .row-name{opacity:.42;filter:saturate(.35);}
+.row-name{transition:opacity .2s,filter .2s;}
+@media(prefers-reduced-motion:reduce){
+  .bar-who.who-pulse,.who-out-n.who-pulse{animation:none;}
 }
-.ghost-task{
-  position:absolute;top:5px;bottom:5px;
-  background:var(--accent-lt);border:1.5px solid var(--accent);
-  border-radius:6px;pointer-events:none;z-index:8;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:0 3px;overflow:hidden;opacity:.85;line-height:1.05;
+.avatar{
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  font-size:10.5px;font-weight:600;color:#5f6368;line-height:1;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  background:#fff;box-shadow:inset 0 0 0 1px #dadce0;
 }
-.ghost-task.ghost-hover{opacity:.78;}
-.ghost-task span{
-  font-size:10px;font-weight:600;color:var(--accent);
-  white-space:nowrap;font-family:'IBM Plex Mono',monospace;
-}
-.ghost-task .slot-dash{font-size:7.5px;line-height:1;opacity:.7;font-weight:500;}
-
-/* ─── Add Popover ─── */
 #apop{
   position:fixed;z-index:300;width:300px;
   background:var(--surface);border-radius:16px;overflow:hidden;
@@ -270,6 +270,11 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 .apop-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;}
 .apop-hdr{display:flex;align-items:center;justify-content:space-between;}
 .apop-who{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.apop-who select{
+  border:none;background:transparent;font:inherit;font-weight:600;
+  outline:none;cursor:pointer;color:var(--text);max-width:160px;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+}
 .apop-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:600;color:#5f6368;font-family:'IBM Plex Sans Thai',sans-serif;line-height:1;background:#fff;box-shadow:inset 0 0 0 1px #dadce0;}
 .apop-x{
   background:none;border:none;color:var(--text-3);cursor:pointer;
@@ -333,7 +338,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   position:fixed;z-index:200;pointer-events:none;display:none;
   background:#3c4043;color:#fff;font-size:12px;line-height:1.5;
   padding:8px 12px;border-radius:8px;box-shadow:0 2px 6px rgba(60,64,67,.3);
-  max-width:260px;white-space:pre-line;
+  max-width:280px;white-space:pre-line;
 }
 
 @media(max-width:640px){.logo-text{display:none;}.topbar{padding:0 12px;gap:8px;}}
@@ -364,7 +369,6 @@ html.vt-enter-right .view-stage{animation:vt-in-r .34s ease;}
 }
 </style>
 
-<!-- Topbar -->
 <div class="topbar">
   <div class="logo-wrap">
     <div class="logo-frame">
@@ -382,8 +386,8 @@ html.vt-enter-right .view-stage{animation:vt-in-r .34s ease;}
   </button>
   <div class="view-wrap">
     <div class="view-switch">
-      <a class="on" href="index.html">ผู้ปฏิบัติงาน</a>
-      <a href="tasks.html">งานผลิต</a>
+      <a href="index.html">ผู้ปฏิบัติงาน</a>
+      <a class="on" href="tasks.html">งานผลิต</a>
     </div>
   </div>
   <button class="btn-create" id="btn-create">
@@ -395,15 +399,13 @@ html.vt-enter-right .view-stage{animation:vt-in-r .34s ease;}
 </div>
 
 <div class="view-stage">
-<!-- Time header -->
 <div class="th-band">
-  <div class="th-name-fixed"><span>ผู้ปฏิบัติงาน</span></div>
+  <div class="th-name-fixed"><span>ชื่องาน</span></div>
   <div class="th-axis-clip" id="th-clip">
     <div class="th-axis-inner" id="th-inner"></div>
   </div>
 </div>
 
-<!-- Grid -->
 <div class="grid-scroll" id="gs">
   <div class="grid-inner" id="gi"></div>
 </div>
@@ -543,26 +545,25 @@ html.vt-enter-right .view-stage{animation:vt-in-r .34s ease;}
 
 const DAY_START=8*60, DAY_END=17*60, TOTAL=DAY_END-DAY_START;
 const BREAK_S=12*60+30, BREAK_E=13*60+15;
-const NAME_W=88;
+const NAME_W=228;
+const LANE_H=44, ROW_PAD=0, BAR_INSET=5;
 
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minToTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
 function pad2(n){return String(n).padStart(2,'0');}
-function snap(m,step=15){return Math.round(m/step)*step;}
-function clamp(m){return Math.max(DAY_START,Math.min(m,DAY_END));}
 
 const C={
-  dist:   {bg:'#4285F4',fg:'#fff',   bd:'#3367d6'},
-  admin:  {bg:'#F9AB00',fg:'#202124',bd:'#f29900'},
-  measure:{bg:'#E37400',fg:'#fff',   bd:'#c75b00'},
-  seafood:{bg:'#9334E6',fg:'#fff',   bd:'#7627c7'},
-  veggie: {bg:'#188038',fg:'#fff',   bd:'#137333'},
-  meat:   {bg:'#0097A7',fg:'#fff',   bd:'#00838f'},
-  special:{bg:'#E8175D',fg:'#fff',   bd:'#c0134f'},
-  trash:  {bg:'#757575',fg:'#fff',   bd:'#616161'},
-  flour:  {bg:'#5E35B1',fg:'#fff',   bd:'#4527a0'},
-  clean:  {bg:'#00897B',fg:'#fff',   bd:'#00695c'},
-  other:  {bg:'#546E7A',fg:'#fff',   bd:'#37474f'},
+  dist:   {bg:'#4285F4'},
+  admin:  {bg:'#F9AB00'},
+  measure:{bg:'#E37400'},
+  seafood:{bg:'#9334E6'},
+  veggie: {bg:'#188038'},
+  meat:   {bg:'#0097A7'},
+  special:{bg:'#E8175D'},
+  trash:  {bg:'#757575'},
+  flour:  {bg:'#5E35B1'},
+  clean:  {bg:'#00897B'},
+  other:  {bg:'#546E7A'},
 };
 function fgFor(bg){
   const n=String(bg).replace('#','');
@@ -606,7 +607,6 @@ function jobColor(label, cat){
 }
 const CN={dist:'เบิกของ',admin:'ธุรการ',measure:'ตวงสูตร',seafood:'ซีฟู้ด',
   veggie:'ผัก/ดอง',meat:'เนื้อสัตว์',special:'พิเศษ',trash:'ขยะ',flour:'แป้ง/ขนม',clean:'ทำความสะอาด'};
-
 const AV_BG='#fff';
 function initial(n){
   let s=String(n).replace(/\s/g,'');
@@ -634,10 +634,51 @@ const WORKERS=[
   {n:'จรัญ',   t:[{s:'08:00',e:'08:30',l:'แป้งไก่มะนาว',c:'flour'},{s:'08:30',e:'09:30',l:'แป้งผสมทะเลทอด',c:'flour'},{s:'11:30',e:'13:15',l:'แป้งผสมไก่เหนียว',c:'flour'},{s:'13:15',e:'14:30',l:'แป้งไก่ - เหนียว 110 กรัม (1x10 ถุง)',c:'flour'}]},
 ];
 
+function jobsFromWorkers(){
+  const map=new Map();
+  WORKERS.forEach((w,wi)=>{
+    w.t.forEach(tk=>{
+      if(!map.has(tk.l)) map.set(tk.l,{l:tk.l,c:tk.c,items:[]});
+      map.get(tk.l).items.push({s:tk.s,e:tk.e,n:w.n,wi,c:tk.c});
+    });
+  });
+  const jobs=[...map.values()];
+  jobs.forEach(j=>{
+    const grouped=new Map();
+    j.items.forEach(it=>{
+      const k=it.s+'|'+it.e;
+      if(!grouped.has(k)) grouped.set(k,{s:it.s,e:it.e,c:it.c,people:[]});
+      grouped.get(k).people.push({n:it.n,wi:it.wi});
+    });
+    j.bars=[...grouped.values()].sort((a,b)=>toMin(a.s)-toMin(b.s));
+    const lanes=[];
+    j.bars.forEach(bar=>{
+      const s=toMin(bar.s), e=toMin(bar.e);
+      let i=lanes.findIndex(ln=>toMin(ln[ln.length-1].e)<=s);
+      if(i<0){i=lanes.length;lanes.push([]);}
+      bar.lane=i;
+      lanes[i].push(bar);
+    });
+    j.laneCount=Math.max(1,lanes.length);
+  });
+  jobs.sort((a,b)=>{
+    const ad=a.c==='dist'?0:1, bd=b.c==='dist'?0:1;
+    if(ad!==bd) return ad-bd;
+    return toMin(a.bars[0].s)-toMin(b.bars[0].s)||a.l.localeCompare(b.l,'th');
+  });
+  return jobs;
+}
+
+function tintHex(hex,amt=0.84){
+  const n=String(hex).replace('#','');
+  const r=parseInt(n.slice(0,2),16), g=parseInt(n.slice(2,4),16), b=parseInt(n.slice(4,6),16);
+  const m=c=>Math.round(c+(255-c)*amt);
+  return `rgb(${m(r)},${m(g)},${m(b)})`;
+}
+
 let SCALE=2, lastFit=-1;
 function tL(m){return(m-DAY_START)*SCALE;}
 function tPx(m){return Math.round(tL(m));}
-function xToMin(x){return DAY_START+x/SCALE;}
 function axisMarks(){
   const t=[];
   for(let m=DAY_START;m<=BREAK_S;m+=30) t.push(m);
@@ -645,65 +686,175 @@ function axisMarks(){
   for(let m=14*60;m<=DAY_END;m+=30) t.push(m);
   return t;
 }
-function slotAt(m){
-  if(m<DAY_START||m>=DAY_END) return null;
-  if(m>=BREAK_S&&m<BREAK_E) return null;
-  if(m<BREAK_S){
-    const s=DAY_START+Math.floor((m-DAY_START)/30)*30;
-    return{s,e:Math.min(s+30,BREAK_S)};
+
+let pulseWho=null;
+function applyPulse(){
+  const on=!!pulseWho;
+  const gi=document.getElementById('gi');
+  if(gi) gi.classList.toggle('is-pulsing',on);
+  document.querySelectorAll('.task').forEach(el=>{
+    const names=(el.dataset.who||'').split('|');
+    el.classList.toggle('task-pulse',on&&names.includes(pulseWho));
+  });
+  document.querySelectorAll('.bar-who, .who-out-n').forEach(el=>{
+    el.classList.toggle('who-pulse',on&&el.dataset.n===pulseWho);
+  });
+  document.querySelectorAll('.who-out').forEach(el=>{
+    el.classList.toggle('has-pulse',on&&!!el.querySelector('.who-pulse'));
+  });
+  document.querySelectorAll('.row').forEach(row=>{
+    row.classList.toggle('row-dim',on&&!row.querySelector('.task-pulse'));
+  });
+}
+function setPulse(name){
+  pulseWho=pulseWho===name?null:name;
+  applyPulse();
+}
+
+function build(){
+  const gs=document.getElementById('gs');
+  const avail=Math.max(1,Math.floor(gs.clientWidth-NAME_W));
+  const UNIT_MIN=15, nUnits=TOTAL/UNIT_MIN, uPx=Math.max(1,Math.floor(avail/nUnits));
+  SCALE=uPx/UNIT_MIN;
+  const TW=uPx*nUnits;
+  const bL=tPx(BREAK_S), bW=tPx(BREAK_E)-bL;
+  const jobs=jobsFromWorkers();
+
+  function tickLabel(a){
+    return`${Math.floor(a/60)}:${String(a%60).padStart(2,'0')}`;
   }
-  if(m<14*60) return{s:BREAK_E,e:14*60};
-  const s=14*60+Math.floor((m-14*60)/30)*30;
-  return{s,e:Math.min(s+30,DAY_END)};
-}
-
-// ─── Drag & Popover state ───
-let drag=null, ghostEl=null, outHandler=null, hoverGhost=null;
-
-function hideHoverGhost(){
-  if(hoverGhost){hoverGhost.remove();hoverGhost=null;}
-}
-function ghostLabel(s,e){
-  return`<span>${minToTime(s)}</span><span class="slot-dash">–</span><span>${minToTime(e)}</span>`;
-}
-function showHoverSlot(area,s,e){
-  if(!hoverGhost||hoverGhost.parentNode!==area){
-    hideHoverGhost();
-    hoverGhost=document.createElement('div');
-    hoverGhost.className='ghost-task ghost-hover';
-    area.appendChild(hoverGhost);
+  function slotHtml(s,e){
+    const x=tPx(s), w=Math.max(0,tPx(e)-x);
+    return `<div class="slot" style="left:${x}px;width:${w}px"><span>${tickLabel(s)}</span><span class="slot-dash">–</span><span>${tickLabel(e)}</span></div>`;
   }
-  hoverGhost.style.left=tL(s)+'px';
-  hoverGhost.style.width=Math.max(tL(e)-tL(s),6)+'px';
-  hoverGhost.innerHTML=ghostLabel(s,e);
+
+  let ticks='';
+  for(const a of axisMarks()){
+    if(a===DAY_END){ticks+=`<div class="tick tick-end"></div>`;continue;}
+    ticks+=`<div class="tick" style="left:${tPx(a)}px"></div>`;
+  }
+  let slots='';
+  for(let m=DAY_START;m<BREAK_S;m+=30) slots+=slotHtml(m,m+30);
+  slots+=slotHtml(BREAK_E,14*60);
+  for(let m=14*60;m<DAY_END;m+=30) slots+=slotHtml(m,m+30);
+  document.getElementById('th-inner').style.width=TW+'px';
+  document.getElementById('th-inner').innerHTML=
+    ticks+slots+
+    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>12:30</span><span class="brk-dash">–</span><span>13:15</span></div>`;
+
+  let gridLines='';
+  for(const a of axisMarks()){
+    if(a===DAY_START||a===DAY_END) continue;
+    gridLines+=`<div class="vgrid${a===BREAK_S||a===BREAK_E?' vgrid-brk':''}" style="left:${tPx(a)}px"></div>`;
+  }
+
+  const html=jobs.map((j,ji)=>{
+    const h=ROW_PAD+j.laneCount*LANE_H;
+    const bars=j.bars.map(bar=>{
+      const col=jobColor(j.l, bar.c);
+      const sMin=toMin(bar.s), eMin=toMin(bar.e);
+      const x0=tL(sMin), x1=Math.min(tL(eMin), TW-2);
+      const barH=LANE_H-BAR_INSET*2;
+      const top=BAR_INSET+bar.lane*LANE_H;
+      const barW=Math.max(1,x1-x0);
+      const next=j.bars.filter(b=>b!==bar&&b.lane===bar.lane&&toMin(b.s)>=eMin)
+        .sort((a,b)=>toMin(a.s)-toMin(b.s))[0];
+      const roomRight=Math.max(0,(next?tL(toMin(next.s)):TW)-x1);
+      const innerFit=(barW-10)/bar.people.length>=50;
+      const canOut=!innerFit&&roomRight>=40;
+      const avs=bar.people.map(p=>{
+        const n=p.n.replace(/"/g,'&quot;');
+        return `<div class="bar-who" data-n="${n}" title="${n}">
+          <div class="avatar" style="background:${AV_BG}">${initial(p.n)}</div>
+          <span style="color:${col.fg}">${p.n}</span>
+        </div>`;
+      }).join('');
+      const who=bar.people.map(p=>p.n).join(', ');
+      const whoAttr=bar.people.map(p=>p.n).join('|');
+      const whoOut=canOut
+        ? `<div class="who-out" style="left:${x0+barW+6}px;top:${top}px;height:${barH}px">${
+            bar.people.map(p=>`<span class="who-out-n" data-n="${p.n.replace(/"/g,'&quot;')}">${p.n}</span>`).join('<span>·</span>')
+          }</div>`
+        : '';
+      return `<div class="task${innerFit?'':' no-name'}" style="left:${x0}px;width:${Math.max(1,x1-x0)}px;top:${top}px;height:${barH}px;background:${col.bg};"
+        data-who="${whoAttr.replace(/"/g,'&quot;')}"
+        data-tip="${j.l}\n${bar.s} – ${bar.e}\n${who}">
+        <div class="bar-avs">${avs}</div>
+      </div>${whoOut}`;
+    }).join('');
+    let hLines='';
+    for(let i=1;i<j.laneCount;i++){
+      hLines+=`<div class="hgrid" style="top:${i*LANE_H}px"></div>`;
+    }
+    hLines+=`<div class="hgrid hgrid-row" style="bottom:0"></div>`;
+    const jobCol=jobColor(j.l, j.c);
+    return `<div class="row" style="height:${h}px">
+      <div class="row-name" title="${j.l}" style="--job-c:${jobCol.bg};--job-tint:${tintHex(jobCol.bg)}">
+        <span class="row-num">${ji+1}</span>
+        <span class="row-name-text">${j.l}</span>
+      </div>
+      <div class="task-area" style="width:${TW}px;height:${h}px">
+        ${gridLines}
+        ${hLines}
+        <div class="brk-col" style="left:${bL}px;width:${bW}px"></div>
+        ${bars}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('gi').innerHTML=html;
+  lastFit=gs.clientWidth;
+
+  const tip=document.getElementById('tip');
+  function placeTip(e){
+    const tw=tip.offsetWidth, th=tip.offsetHeight, gap=8, pad=8;
+    let x=e.clientX+gap, y=e.clientY+gap;
+    if(x+tw>innerWidth-pad) x=e.clientX-tw-gap;
+    if(y+th>innerHeight-pad) y=e.clientY-th-gap;
+    tip.style.left=Math.max(pad,x)+'px';
+    tip.style.top=Math.max(pad,y)+'px';
+  }
+  document.querySelectorAll('.task').forEach(el=>{
+    el.addEventListener('mouseenter',e=>{tip.textContent=el.dataset.tip;tip.style.display='block';placeTip(e);});
+    el.addEventListener('mousemove',placeTip);
+    el.addEventListener('mouseleave',()=>{tip.style.display='none';});
+  });
+  document.querySelectorAll('.bar-who, .who-out-n').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.stopPropagation();
+      tip.style.display='none';
+      setPulse(el.dataset.n);
+    });
+  });
+  applyPulse();
 }
 
+let outHandler=null;
 function closePopover(){
   const p=document.getElementById('apop');
   if(p)p.remove();
-  if(ghostEl){ghostEl.remove();ghostEl=null;}
-  hideHoverGhost();
   if(outHandler){document.removeEventListener('mousedown',outHandler);outHandler=null;}
 }
 
 function showPopover(workerIdx, sMin, eMin, anchorRect){
   closePopover();
-  const w=WORKERS[workerIdx];
-  const avColor=AV_BG;
+  let wi=workerIdx;
   const catKeys=Object.keys(C).filter(k=>k!=='other');
 
-  function validate(s,e){
+  function validate(s,e,idx){
+    const w=WORKERS[idx];
     const brk=s<BREAK_E&&e>BREAK_S;
     const ovlp=w.t.some(tk=>{const ts=toMin(tk.s),te=toMin(tk.e);return s<te&&e>ts;});
     return{brk,ovlp};
   }
 
   const catHtml=catKeys.map((k,i)=>{
-    const v=C[k];
+    const bg=C[k].bg;
     return `<button class="apop-cat${i===0?' apop-cat-sel':''}" data-k="${k}"
-      style="--cb:${v.bd};--cg:${v.bg};--cf:${v.fg}">${CN[k]||k}</button>`;
+      style="--cb:${bg};--cg:${tintHex(bg)};--cf:${fgFor(bg)}">${CN[k]||k}</button>`;
   }).join('');
 
+  const optHtml=WORKERS.map((w,i)=>`<option value="${i}"${i===wi?' selected':''}>${w.n}</option>`).join('');
   const pop=document.createElement('div');
   pop.id='apop';
   pop.innerHTML=`
@@ -711,8 +862,8 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     <div class="apop-body">
       <div class="apop-hdr">
         <div class="apop-who">
-          <div class="apop-avatar" style="background:${avColor}">${initial(w.n)}</div>
-          ${w.n}
+          <div class="apop-avatar" id="apop-av">${initial(WORKERS[wi].n)}</div>
+          <select id="apop-who">${optHtml}</select>
         </div>
         <button class="apop-x" title="ปิด">✕</button>
       </div>
@@ -743,7 +894,7 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   document.body.appendChild(pop);
 
   function updateWarns(s,e){
-    const v=validate(s,e);
+    const v=validate(s,e,wi);
     let h='';
     if(v.brk) h+=`<div class="apop-warn warn-brk">🚫 คร่อมพักเบรก 12:30–13:15</div>`;
     if(v.ovlp) h+=`<div class="apop-warn warn-ovlp">⚠️ ทับซ้อนกับงานที่มีอยู่</div>`;
@@ -751,12 +902,11 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   }
   updateWarns(sMin,eMin);
 
-  // Position
   const pw=300, ph=390;
   let px=anchorRect.left+anchorRect.width/2-pw/2;
   px=Math.max(12,Math.min(px,window.innerWidth-pw-12));
-  let py=anchorRect.top-ph-14;
-  if(py<52) py=anchorRect.bottom+10;
+  let py=anchorRect.bottom+10;
+  if(py+ph>window.innerHeight-12) py=Math.max(52,anchorRect.top-ph-14);
   py=Math.min(py,window.innerHeight-ph-12);
   pop.style.left=px+'px';
   pop.style.top=py+'px';
@@ -779,7 +929,12 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     });
   });
 
-  // Cat selection
+  document.getElementById('apop-who').addEventListener('change',e=>{
+    wi=parseInt(e.target.value,10)||0;
+    document.getElementById('apop-av').textContent=initial(WORKERS[wi].n);
+    updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em'));
+  });
+
   let selCat=catKeys[0];
   pop.querySelectorAll('.apop-cat').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -800,7 +955,7 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     const s=readSpin('apop-sh','apop-sm');
     const e=readSpin('apop-eh','apop-em');
     if(e<=s)return;
-    w.t.push({s:minToTime(s),e:minToTime(e),l:name,c:selCat});
+    WORKERS[wi].t.push({s:minToTime(s),e:minToTime(e),l:name,c:selCat});
     closePopover();build();
   }
 
@@ -820,176 +975,20 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   document.getElementById('apop-n').focus();
 }
 
-let pulseLabel=null;
-function applyPulse(){
-  document.querySelectorAll('.task').forEach(el=>{
-    el.classList.toggle('task-pulse',!!pulseLabel&&el.dataset.l===pulseLabel);
-  });
-  const gi=document.getElementById('gi');
-  if(gi) gi.classList.toggle('is-pulsing',!!pulseLabel);
-}
-function setPulse(label){
-  pulseLabel=pulseLabel===label?null:label;
-  applyPulse();
-}
-
-// ─── Build ───
-function build(){
-  if(drag)drag=null;
-  closePopover();
-
-  const gs=document.getElementById('gs');
-  const avail=Math.max(1,Math.floor(gs.clientWidth-NAME_W));
-  const UNIT_MIN=15, nUnits=TOTAL/UNIT_MIN, uPx=Math.max(1,Math.floor(avail/nUnits));
-  SCALE=uPx/UNIT_MIN;
-  const TW=uPx*nUnits;
-  const bL=tPx(BREAK_S), bW=tPx(BREAK_E)-bL;
-
-  function tickLabel(a){
-    return`${Math.floor(a/60)}:${String(a%60).padStart(2,'0')}`;
-  }
-  function slotHtml(s,e){
-    const x=tPx(s), w=Math.max(0,tPx(e)-x);
-    return `<div class="slot" style="left:${x}px;width:${w}px"><span>${tickLabel(s)}</span><span class="slot-dash">–</span><span>${tickLabel(e)}</span></div>`;
-  }
-
-  let ticks='';
-  for(const a of axisMarks()){
-    if(a===DAY_END){
-      ticks+=`<div class="tick tick-end"></div>`;
-      continue;
-    }
-    ticks+=`<div class="tick" style="left:${tPx(a)}px"></div>`;
-  }
-
-  let slots='';
-  for(let m=DAY_START;m<BREAK_S;m+=30) slots+=slotHtml(m,m+30);
-  slots+=slotHtml(BREAK_E,14*60);
-  for(let m=14*60;m<DAY_END;m+=30) slots+=slotHtml(m,m+30);
-
-  document.getElementById('th-inner').style.width=TW+'px';
-  document.getElementById('th-inner').innerHTML=
-    ticks+slots+
-    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>12:30</span><span class="brk-dash">–</span><span>13:15</span></div>`;
-
-  // Rows
-  const tip=document.getElementById('tip');
-  const html=WORKERS.map((w,wi)=>{
-    const avColor=AV_BG;
-    let gridLines='';
-    for(const a of axisMarks()){
-      if(a===DAY_START||a===DAY_END) continue;
-      gridLines+=`<div class="vgrid${a===BREAK_S||a===BREAK_E?' vgrid-brk':''}" style="left:${tPx(a)}px"></div>`;
-    }
-    const tasks=w.t.map(tk=>{
-      const col=jobColor(tk.l, tk.c);
-      const sMin=toMin(tk.s), eMin=toMin(tk.e);
-      const x0=tL(sMin), x1=Math.min(tL(eMin), TW-2);
-      return `<div class="task" style="left:${x0}px;width:${Math.max(1,x1-x0)}px;background:${col.bg};"
-        data-s="${tk.s}" data-e="${tk.e}" data-l="${tk.l.replace(/"/g,'&quot;')}"
-        data-tip="${w.n}\n${tk.s} – ${tk.e}\n${tk.l}">
-        <span style="color:${col.fg}">${tk.l}</span>
-      </div>`;
-    }).join('');
-    return `<div class="row">
-      <div class="row-name">
-        <div class="avatar" style="background:${avColor}">${initial(w.n)}</div>
-        <span class="row-name-text">${w.n}</span>
-      </div>
-      <div class="task-area" style="width:${TW}px">
-        ${gridLines}
-        <div class="brk-col" style="left:${bL}px;width:${bW}px"></div>
-        ${tasks}
-      </div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('gi').innerHTML=html;
-  lastFit=gs.clientWidth;
-
-  function placeTip(e){
-    const tw=tip.offsetWidth, th=tip.offsetHeight, gap=8, pad=8;
-    let x=e.clientX+gap, y=e.clientY+gap;
-    if(x+tw>innerWidth-pad) x=e.clientX-tw-gap;
-    if(y+th>innerHeight-pad) y=e.clientY-th-gap;
-    tip.style.left=Math.max(pad,x)+'px';
-    tip.style.top=Math.max(pad,y)+'px';
-  }
-  document.querySelectorAll('.task').forEach(el=>{
-    el.addEventListener('mouseenter',e=>{tip.textContent=el.dataset.tip;tip.style.display='block';placeTip(e);});
-    el.addEventListener('mousemove',placeTip);
-    el.addEventListener('mouseleave',()=>{tip.style.display='none';});
-    el.addEventListener('click',e=>{
-      e.stopPropagation();
-      setPulse(el.dataset.l);
-    });
-  });
-  applyPulse();
-
-  // Hover slot preview + drag-to-create
-  document.querySelectorAll('.task-area').forEach((area,idx)=>{
-    area.addEventListener('mousemove',e=>{
-      if(drag||document.getElementById('apop'))return;
-      if(e.target.closest('.task,.brk-col')){hideHoverGhost();return;}
-      const rect=area.getBoundingClientRect();
-      const sl=slotAt(xToMin(e.clientX-rect.left));
-      if(!sl){hideHoverGhost();return;}
-      showHoverSlot(area,sl.s,sl.e);
-    });
-    area.addEventListener('mouseleave',hideHoverGhost);
-    area.addEventListener('mousedown',e=>{
-      if(e.button!==0||e.target.closest('.task,.brk-col'))return;
-      e.preventDefault();
-      const rect=area.getBoundingClientRect();
-      const sl=slotAt(xToMin(e.clientX-rect.left));
-      if(!sl)return;
-      hideHoverGhost();
-      const sMin=sl.s, eMin=sl.e;
-      const ghost=document.createElement('div');
-      ghost.className='ghost-task';
-      ghost.innerHTML=ghostLabel(sMin,eMin);
-      ghost.style.left=tL(sMin)+'px';
-      ghost.style.width=(tL(eMin)-tL(sMin))+'px';
-      area.appendChild(ghost);
-      ghostEl=ghost;
-      drag={workerIdx:idx,area,sMin,curMin:eMin,ghost,x0:e.clientX};
-    });
-  });
-}
-
-// ─── Document events ───
-document.addEventListener('mousemove',e=>{
-  if(!drag)return;
-  const rect=drag.area.getBoundingClientRect();
-  const curMin=clamp(snap(Math.max(drag.sMin+15,xToMin(e.clientX-rect.left))));
-  drag.curMin=curMin;
-  drag.ghost.style.width=Math.max(tL(curMin)-tL(drag.sMin),6)+'px';
-  drag.ghost.innerHTML=ghostLabel(drag.sMin,curMin);
-});
-
-document.addEventListener('mouseup',e=>{
-  if(!drag)return;
-  const d=drag;drag=null;
-  const ghostRect=d.ghost.getBoundingClientRect();
-  showPopover(d.workerIdx,d.sMin,d.curMin,ghostRect);
-});
-
 document.getElementById('btn-create').addEventListener('click',e=>{
   showPopover(0,DAY_START,DAY_START+30,e.currentTarget.getBoundingClientRect());
-});
-document.getElementById('gs').addEventListener('click',e=>{
-  if(!e.target.closest('.task')) setPulse(null);
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closePopover();setPulse(null);}
 });
+document.getElementById('gs').addEventListener('click',e=>{
+  if(!e.target.closest('.bar-who, .who-out-n')) setPulse(null);
+});
 
-// Scroll sync
-function syncHeader(){
+document.getElementById('gs').addEventListener('scroll',()=>{
   document.getElementById('th-inner').style.transform=
     `translateX(-${document.getElementById('gs').scrollLeft}px)`;
-}
-document.getElementById('gs').addEventListener('scroll',syncHeader);
+});
 
 build();
 requestAnimationFrame(()=>{lastFit=-1;build();});
