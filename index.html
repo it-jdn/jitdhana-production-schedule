@@ -521,8 +521,8 @@ function build(){
 
   const gs=document.getElementById('gs');
   const avail=Math.max(gs.clientWidth-NAME_W,640);
-  SCALE=avail/TOTAL;
-  const TW=TOTAL*SCALE+60;
+  SCALE=(avail+60)/TOTAL;
+  const TW=TOTAL*SCALE;
   const bL=(BREAK_S-DAY_START)*SCALE, bW=(BREAK_E-BREAK_S)*SCALE;
   const tW=(s,e)=>Math.max((toMin(e)-toMin(s))*SCALE-2,6);
 
@@ -532,7 +532,7 @@ function build(){
     const a=DAY_START+m,h=Math.floor(a/60),mn=a%60;
     ticks+=`<div class="tick" style="left:${m*SCALE}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
   }
-  document.getElementById('th-inner').style.width=TW+'px';
+  document.getElementById('th-inner').style.width=(TW+40)+'px';
   document.getElementById('th-inner').innerHTML=
     ticks+`<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`;
 
@@ -560,7 +560,7 @@ function build(){
         <div class="avatar" style="background:${avColor}">${PERSON_SVG}</div>
         <span class="row-name-text">${w.n}</span>
       </div>
-      <div class="task-area" style="width:${TW}px">
+      <div class="task-area" style="width:${TW+40}px">
         ${gridLines}
         <div class="brk-col" style="left:${bL}px;width:${bW}px"></div>
         ${tasks}
