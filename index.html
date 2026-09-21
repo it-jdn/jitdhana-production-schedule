@@ -7,6 +7,7 @@
   --sf-dim: #f8f9fa;
   --sf-hover: #f1f3f4;
   --border: #dadce0;
+  --name-w: 88px;
   --border-s: #bdc1c6;
   --text: #202124;
   --text-2: #5f6368;
@@ -66,43 +67,47 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   box-shadow:0 1px 4px rgba(60,64,67,.1);
 }
 .th-name-fixed{
-  width:120px;flex-shrink:0;
+  width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
   display:flex;align-items:center;justify-content:flex-end;
-  padding-right:14px;background:var(--surface);
+  padding-right:8px;background:var(--surface);
 }
 .th-name-fixed span{
-  font-size:10px;font-weight:600;color:var(--text-3);
-  letter-spacing:.08em;text-transform:uppercase;
+  font-size:9.5px;font-weight:600;color:var(--text-3);
+  letter-spacing:.04em;text-transform:uppercase;
 }
 .th-axis-clip{flex:1;overflow:hidden;position:relative;}
 .th-axis-inner{position:relative;height:100%;}
 .tick{
-  position:absolute;top:0;bottom:0;
+  position:absolute;top:0;bottom:0;z-index:2;
   display:flex;align-items:center;padding-left:6px;
   border-left:1px solid var(--border);
+  pointer-events:none;
 }
 .tick span{
   font-family:'IBM Plex Mono',monospace;
   font-size:10.5px;color:var(--text-2);font-weight:600;white-space:nowrap;
 }
-/* 17:00 end-of-day label: pinned to right edge of th-inner */
-.tick-end{
-  position:absolute;top:0;bottom:0;right:0;
-  display:flex;align-items:center;padding-right:5px;
-  border-right:1px solid var(--border);
+/* 17:00: line + label on the last pixel of the grid */
+.tick.tick-end{
+  left:auto;right:0;padding-left:0;padding-right:4px;
+  border-left:none;border-right:1px solid var(--border);
+  justify-content:flex-end;
 }
 .brk-th{
-  position:absolute;top:0;bottom:0;overflow:hidden;
+  position:absolute;top:0;bottom:0;overflow:hidden;z-index:1;
   background:#fef3f2;
   border-left:1px dashed var(--border-s);
   border-right:1px dashed var(--border-s);
-  display:flex;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;padding:0 2px;line-height:1.15;
 }
 .brk-th span{
-  font-size:9px;font-weight:600;color:#c5221f;
-  letter-spacing:.02em;font-family:'IBM Plex Sans Thai',sans-serif;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;font-weight:600;color:#c5221f;
+  letter-spacing:-.03em;white-space:nowrap;
 }
+.brk-th .brk-dash{font-size:8px;line-height:1;opacity:.75;font-weight:500;}
 
 /* ─── Grid ─── */
 .grid-scroll{overflow-x:auto;}
@@ -110,13 +115,13 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 .row{display:flex;height:60px;border-bottom:1px solid var(--border);}
 .row:last-child{border-bottom:none;}
 .row-name{
-  width:120px;flex-shrink:0;
+  width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
-  display:flex;align-items:center;padding:0 10px;gap:9px;
+  display:flex;align-items:center;padding:0 6px;gap:6px;
   background:var(--surface);position:sticky;left:0;z-index:10;
 }
 .avatar{
-  width:34px;height:34px;border-radius:50%;
+  width:22px;height:22px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
 }
@@ -126,7 +131,9 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   flex:1;min-width:0;
 }
 .task-area{
-  flex:1;position:relative;background:var(--surface);cursor:crosshair;
+  position:relative;background:var(--surface);cursor:crosshair;
+  overflow:hidden;flex-shrink:0;
+  box-shadow:inset -1px 0 0 var(--border);
 }
 .task-area:hover{background:#f8fbff;}
 .row:nth-child(even) .task-area{background:#fafbff;}
@@ -149,6 +156,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   transition:filter .12s,box-shadow .12s,transform .1s;z-index:4;
   box-shadow:0 1px 2px rgba(0,0,0,.12);
 }
+.task.task-flush-r{border-radius:6px 0 0 6px;}
 .task:hover{
   filter:brightness(.9);
   box-shadow:0 2px 8px rgba(60,64,67,.28),0 1px 3px rgba(60,64,67,.15);
@@ -327,7 +335,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
 <script>
 const DAY_START=8*60, DAY_END=17*60, TOTAL=DAY_END-DAY_START;
 const BREAK_S=12*60+30, BREAK_E=13*60+15;
-const NAME_W=120;
+const NAME_W=88;
 
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minToTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
@@ -353,7 +361,7 @@ const CN={dist:'เบิกของ',admin:'ธุรการ',measure:'ต�
 // Avatar colors (Google palette)
 const AV_COLORS=['#bdc1c6','#bdc1c6','#bdc1c6','#bdc1c6','#bdc1c6',
   '#bdc1c6','#bdc1c6','#bdc1c6','#bdc1c6','#bdc1c6','#bdc1c6','#bdc1c6'];
-const PERSON_SVG=`<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+const PERSON_SVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
 
 const WORKERS=[
   {n:'แจ็ค',    t:[{s:'08:00',e:'09:00',l:'เบิกของส่งสาขา-สด',c:'dist'},{s:'11:00',e:'11:30',l:'งานธุรการ',c:'admin'},{s:'16:30',e:'17:00',l:'ตวงสูตร // สด',c:'admin'}]},
@@ -375,8 +383,8 @@ const LG=[
   {k:'special',n:'งานพิเศษ'},{k:'flour',n:'แป้ง/ขนม'},{k:'clean',n:'ทำความสะอาด'},
 ];
 
-let SCALE=2, OFFSET=0;
-const BRK_VIS=44; // visual px for break zone
+let SCALE=2, OFFSET=0, lastFit=-1;
+const BRK_VIS=58; // visual px for break zone (fits 12:30 / 13:15)
 function tL(m){
   if(m<=BREAK_S) return(m-DAY_START)*SCALE;
   if(m>=BREAK_E) return(m-DAY_START)*SCALE-OFFSET;
@@ -537,27 +545,40 @@ function build(){
 
   const gs=document.getElementById('gs');
   const NON_BRK=TOTAL-(BREAK_E-BREAK_S); // 495 min of non-break time
-  SCALE=Math.max((gs.clientWidth-NAME_W-BRK_VIS)/NON_BRK,1);
+  const TW=Math.max(1,Math.floor(gs.clientWidth-NAME_W));
+  SCALE=(TW-BRK_VIS)/NON_BRK;
   OFFSET=(BREAK_E-BREAK_S)*SCALE-BRK_VIS;
-  const TW=TOTAL*SCALE-OFFSET;
-  const bL=(BREAK_S-DAY_START)*SCALE, bW=BRK_VIS;
+  const bL=tL(BREAK_S), bW=BRK_VIS;
 
-  // Time header
+  function tickLabel(a){
+    return`${String(Math.floor(a/60)).padStart(2,'0')}:${String(a%60).padStart(2,'0')}`;
+  }
+
+  // Time header: label sits in the cell to the right of each tick.
+  // 12:30 is the break-band caption so it stays visible.
+  // 17:00 is pinned to the right edge of the same grid the tasks use.
   let ticks='';
+  const lastSlot=tL(DAY_END)-tL(DAY_END-30);
+  const show1630=lastSlot>=72;
   for(let m=0;m<=TOTAL;m+=30){
     const a=DAY_START+m;
     if(a>BREAK_S&&a<BREAK_E) continue;
-    if(a===DAY_END) continue; // 17:00 rendered as fixed end-label
-    const h=Math.floor(a/60),mn=a%60;
-    ticks+=`<div class="tick" style="left:${tL(a)}px"><span>${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}</span></div>`;
+    if(a===DAY_END){
+      ticks+=`<div class="tick tick-end"><span>17:00</span></div>`;
+      continue;
+    }
+    if(a===BREAK_S){
+      ticks+=`<div class="tick" style="left:${tL(a)}px"></div>`;
+      continue;
+    }
+    const label=(a===DAY_END-30&&!show1630)?'':tickLabel(a);
+    ticks+=`<div class="tick" style="left:${tL(a)}px">${label?`<span>${label}</span>`:''}</div>`;
   }
-  // break-end tick line only (no label — too close to 13:30)
   ticks+=`<div class="tick" style="left:${tL(BREAK_E)}px"></div>`;
   document.getElementById('th-inner').style.width=TW+'px';
   document.getElementById('th-inner').innerHTML=
     ticks+
-    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>พักเบรก</span></div>`+
-    `<div class="tick-end"><span>17:00</span></div>`;
+    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>12:30</span><span class="brk-dash">–</span><span>13:15</span></div>`;
 
   // Rows
   const tip=document.getElementById('tip');
@@ -569,6 +590,7 @@ function build(){
     for(let m=0;m<=TOTAL;m+=30){
       const a=DAY_START+m;
       if(a>BREAK_S&&a<BREAK_E) continue;
+      if(a===DAY_END) continue; // 17:00 line = task-area inset shadow
       const isHour=a%60===0;
       gridLines+=`<div class="vgrid${isHour?' vgrid-hour':''}" style="left:${tL(a)}px"></div>`;
     }
@@ -576,9 +598,11 @@ function build(){
     gridLines+=`<div class="vgrid vgrid-hour" style="left:${tL(BREAK_E)}px"></div>`;
     const tasks=w.t.map(tk=>{
       const col=C[tk.c]||C.other;
-      const l=tL(toMin(tk.s));
-      const r=TW-tL(toMin(tk.e));
-      return `<div class="task" style="left:${l}px;right:${r}px;background:${col.bg};"
+      const sMin=toMin(tk.s), eMin=toMin(tk.e);
+      const x0=tL(sMin), x1=tL(eMin);
+      const flush=eMin>=DAY_END||eMin===BREAK_S?' task-flush-r':'';
+      return `<div class="task${flush}" style="left:${x0}px;width:${Math.max(1,x1-x0)}px;background:${col.bg};"
+        data-s="${tk.s}" data-e="${tk.e}"
         data-tip="${w.n}\n${tk.s} – ${tk.e}\n${tk.l}">
         <span style="color:${col.fg}">${tk.l}</span>
       </div>`;
@@ -598,6 +622,7 @@ function build(){
 
   document.getElementById('gi').innerHTML=html;
   document.getElementById('sv-t').textContent=count;
+  lastFit=gs.clientWidth;
 
   // Tooltip
   document.querySelectorAll('.task').forEach(el=>{
@@ -661,6 +686,15 @@ document.getElementById('legend').innerHTML=
   `<div style="flex:1"></div><span style="font-size:11px;color:var(--text-3);font-weight:500;">📅 จ–ส · 6 วัน/สัปดาห์</span>`;
 
 build();
+requestAnimationFrame(()=>{lastFit=-1;build();});
 let rt;
-window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(build,150);});
+function scheduleBuild(){
+  const w=document.getElementById('gs').clientWidth;
+  if(w===lastFit) return;
+  clearTimeout(rt);rt=setTimeout(build,80);
+}
+window.addEventListener('resize',scheduleBuild);
+if(typeof ResizeObserver!=='undefined'){
+  new ResizeObserver(scheduleBuild).observe(document.getElementById('gs'));
+}
 </script>
