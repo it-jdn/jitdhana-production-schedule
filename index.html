@@ -203,6 +203,7 @@ body{
   background:#fef3f2;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;padding:0 2px;line-height:1.05;
+  box-shadow:inset 1px 0 0 var(--border-s),inset -1px 0 0 var(--border-s);
 }
 .brk-th span{
   font-family:'IBM Plex Mono',monospace;
@@ -253,11 +254,11 @@ body{
   position:absolute;top:0;bottom:0;width:1px;
   background:rgba(218,220,224,.7);pointer-events:none;z-index:1;
 }
-.vgrid-brk{background:var(--border-s);z-index:7;}
 .brk-col{
   position:absolute;top:0;bottom:0;
   background:repeating-linear-gradient(-45deg,transparent,transparent 4px,rgba(0,0,0,.03) 4px,rgba(0,0,0,.03) 8px);
   pointer-events:none;z-index:6;
+  box-shadow:inset 1px 0 0 var(--border-s),inset -1px 0 0 var(--border-s);
 }
 .task{
   position:absolute;top:5px;bottom:5px;
@@ -331,7 +332,6 @@ body{
   animation:popIn .14s cubic-bezier(.22,1,.36,1);
 }
 @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(-6px);}to{opacity:1;transform:none;}}
-.apop-stripe{height:5px;background:var(--accent);}
 .apop-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;}
 .apop-hdr{display:flex;align-items:center;justify-content:space-between;}
 .apop-who{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
@@ -677,7 +677,7 @@ const C={
   special:{bg:'#E8175D',fg:'#fff',   bd:'#c0134f'},
   trash:  {bg:'#757575',fg:'#fff',   bd:'#616161'},
   flour:  {bg:'#5E35B1',fg:'#fff',   bd:'#4527a0'},
-  clean:  {bg:'#00897B',fg:'#fff',   bd:'#00695c'},
+  clean:  {bg:'#9E9E9E',fg:'#fff',   bd:'#757575'},
   other:  {bg:'#546E7A',fg:'#fff',   bd:'#37474f'},
 };
 function fgFor(bg){
@@ -686,7 +686,7 @@ function fgFor(bg){
   return (r*299+g*587+b*114)/1000>162?'#202124':'#fff';
 }
 const JOB_COLORS={
-  'เบิกของส่งสาขา-ผัก':'#1A73E8',
+  'เบิกของส่งสาขา-ผัก':'#34A853',
   'เบิกของส่งสาขา-สด':'#00ACC1',
   'เบิกของส่งสาขา-แห้ง':'#3949AB',
   'ซุปเคล 240 กรัม // 50 แพ็ค':'#607D8B',
@@ -709,12 +709,12 @@ const JOB_COLORS={
   'กุ้ง 120 ตัว/กก. (Repack) //20 กก.':'#E91E63',
   'แป้งข้าวเหนียวกวน':'#9C27B0',
   'เบิกโรงแกง ไก่ทอด ขนมจีน':'#E53935',
-  'ทำความสะอาด ห้องซีฟู้ด':'#26A69A',
+  'ทำความสะอาด ห้องซีฟู้ด':'#BDBDBD',
   'เก็บขยะ':'#78909C',
   'ตวงสูตร // สด':'#FB8C00',
-  'ทำความสะอาดครัว A':'#2E7D32',
-  'ทำความสะอาดครัว B':'#00695C',
-  'ทำความสะอาดห้อง marinite':'#66BB6A',
+  'ทำความสะอาดครัว A':'#9E9E9E',
+  'ทำความสะอาดครัว B':'#757575',
+  'ทำความสะอาดห้อง marinite':'#616161',
 };
 function jobColor(label, cat){
   const bg=JOB_COLORS[label]||(C[cat]||C.other).bg;
@@ -824,7 +824,6 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   const pop=document.createElement('div');
   pop.id='apop';
   pop.innerHTML=`
-    <div class="apop-stripe"></div>
     <div class="apop-body">
       <div class="apop-hdr">
         <div class="apop-who">
@@ -1051,6 +1050,7 @@ function build(){
       ticks+=`<div class="tick tick-end"></div>`;
       continue;
     }
+    if(a===BREAK_S||a===BREAK_E) continue;
     ticks+=`<div class="tick" style="left:${tPx(a)}px"></div>`;
   }
 
@@ -1072,8 +1072,8 @@ function build(){
     const avColor=AV_BG;
     let gridLines='';
     for(const a of axisMarks()){
-      if(a===DAY_START||a===DAY_END) continue;
-      gridLines+=`<div class="vgrid${a===BREAK_S||a===BREAK_E?' vgrid-brk':''}" style="left:${tPx(a)}px"></div>`;
+      if(a===DAY_START||a===DAY_END||a===BREAK_S||a===BREAK_E) continue;
+      gridLines+=`<div class="vgrid" style="left:${tPx(a)}px"></div>`;
     }
     const tasks=w.t.map(tk=>{
       const col=jobColor(tk.l, tk.c);

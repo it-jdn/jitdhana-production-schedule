@@ -168,7 +168,7 @@ body{
   width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
   display:flex;align-items:center;justify-content:flex-start;
-  padding:0 10px 0 30px;background:var(--surface);
+  padding:0 10px 0 32px;background:var(--surface);
   position:sticky;left:0;z-index:3;overflow:hidden;
 }
 .th-name-fixed span{
@@ -200,6 +200,7 @@ body{
   background:#fef3f2;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;padding:0 2px;line-height:1.05;
+  box-shadow:inset 1px 0 0 var(--border-s),inset -1px 0 0 var(--border-s);
 }
 .brk-th span{
   font-family:'IBM Plex Mono',monospace;
@@ -222,14 +223,19 @@ body{
   width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
   border-bottom:1px solid var(--border);
-  border-left:4px solid var(--job-c,#dadce0);
-  display:flex;align-items:center;gap:6px;padding:0 8px 0 6px;
+  display:flex;align-items:center;gap:6px;padding:0 8px 0 16px;
   background:var(--job-tint,#fff);position:sticky;left:0;z-index:12;
 }
+.row-name::before{
+  content:'';
+  position:absolute;left:6px;top:8px;bottom:8px;
+  width:6px;border-radius:999px;
+  background:var(--job-c,#dadce0);pointer-events:none;
+}
 .row-num{
-  flex-shrink:0;min-width:16px;text-align:right;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10.5px;font-weight:600;color:var(--job-c,#5f6368);
+  flex-shrink:0;min-width:20px;text-align:right;
+  font-family:'Sarabun',sans-serif;
+  font-size:12px;font-weight:600;color:var(--text);
 }
 .row-name-text{
   font-family:'Sarabun',sans-serif;
@@ -246,7 +252,6 @@ body{
   position:absolute;top:0;bottom:0;width:1px;
   background:rgba(218,220,224,.7);pointer-events:none;z-index:1;
 }
-.vgrid-brk{background:var(--border-s);z-index:7;}
 .hgrid{
   position:absolute;left:0;right:0;height:1px;
   background:rgba(218,220,224,.7);pointer-events:none;z-index:1;
@@ -256,6 +261,7 @@ body{
   position:absolute;top:0;bottom:0;
   background:repeating-linear-gradient(-45deg,transparent,transparent 4px,rgba(0,0,0,.03) 4px,rgba(0,0,0,.03) 8px);
   pointer-events:none;z-index:6;
+  box-shadow:inset 1px 0 0 var(--border-s),inset -1px 0 0 var(--border-s);
 }
 .task{
   position:absolute;
@@ -339,7 +345,6 @@ body{
   animation:popIn .14s cubic-bezier(.22,1,.36,1);
 }
 @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(-6px);}to{opacity:1;transform:none;}}
-.apop-stripe{height:5px;background:var(--accent);}
 .apop-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;}
 .apop-hdr{display:flex;align-items:center;justify-content:space-between;}
 .apop-who{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
@@ -430,7 +435,7 @@ body{
   .btn-create-label{display:none;}
   .btn-create{padding:5px 8px;}
   :root{--name-w:116px;}
-  .row-name{padding:0 6px 0 4px;gap:4px;}
+  .row-name{padding:0 6px 0 14px;gap:4px;}
   .topbar{gap:6px;padding:6px max(8px,env(safe-area-inset-right)) 6px max(8px,env(safe-area-inset-left));}
   .topbar-actions{gap:6px;}
 }
@@ -690,7 +695,7 @@ const C={
   special:{bg:'#E8175D'},
   trash:  {bg:'#757575'},
   flour:  {bg:'#5E35B1'},
-  clean:  {bg:'#00897B'},
+  clean:  {bg:'#9E9E9E'},
   other:  {bg:'#546E7A'},
 };
 function fgFor(bg){
@@ -699,7 +704,7 @@ function fgFor(bg){
   return (r*299+g*587+b*114)/1000>162?'#202124':'#fff';
 }
 const JOB_COLORS={
-  'เบิกของส่งสาขา-ผัก':'#1A73E8',
+  'เบิกของส่งสาขา-ผัก':'#34A853',
   'เบิกของส่งสาขา-สด':'#00ACC1',
   'เบิกของส่งสาขา-แห้ง':'#3949AB',
   'ซุปเคล 240 กรัม // 50 แพ็ค':'#607D8B',
@@ -722,12 +727,12 @@ const JOB_COLORS={
   'กุ้ง 120 ตัว/กก. (Repack) //20 กก.':'#E91E63',
   'แป้งข้าวเหนียวกวน':'#9C27B0',
   'เบิกโรงแกง ไก่ทอด ขนมจีน':'#E53935',
-  'ทำความสะอาด ห้องซีฟู้ด':'#26A69A',
+  'ทำความสะอาด ห้องซีฟู้ด':'#BDBDBD',
   'เก็บขยะ':'#78909C',
   'ตวงสูตร // สด':'#FB8C00',
-  'ทำความสะอาดครัว A':'#2E7D32',
-  'ทำความสะอาดครัว B':'#00695C',
-  'ทำความสะอาดห้อง marinite':'#66BB6A',
+  'ทำความสะอาดครัว A':'#9E9E9E',
+  'ทำความสะอาดครัว B':'#757575',
+  'ทำความสะอาดห้อง marinite':'#616161',
 };
 function jobColor(label, cat){
   const bg=JOB_COLORS[label]||(C[cat]||C.other).bg;
@@ -925,6 +930,7 @@ function build(){
   let ticks='';
   for(const a of axisMarks()){
     if(a===DAY_END){ticks+=`<div class="tick tick-end"></div>`;continue;}
+    if(a===BREAK_S||a===BREAK_E) continue;
     ticks+=`<div class="tick" style="left:${tPx(a)}px"></div>`;
   }
   let slots='';
@@ -940,8 +946,8 @@ function build(){
 
   let gridLines='';
   for(const a of axisMarks()){
-    if(a===DAY_START||a===DAY_END) continue;
-    gridLines+=`<div class="vgrid${a===BREAK_S||a===BREAK_E?' vgrid-brk':''}" style="left:${tPx(a)}px"></div>`;
+    if(a===DAY_START||a===DAY_END||a===BREAK_S||a===BREAK_E) continue;
+    gridLines+=`<div class="vgrid" style="left:${tPx(a)}px"></div>`;
   }
 
   const html=jobs.map((j,ji)=>{
@@ -987,7 +993,7 @@ function build(){
     const jobCol=jobColor(j.l, j.c);
     return `<div class="row" style="height:${h}px">
       <div class="row-name" title="${j.l}" style="--job-c:${jobCol.bg};--job-tint:${tintHex(jobCol.bg)}">
-        <span class="row-num">${ji+1}</span>
+        <span class="row-num">${ji+1}.</span>
         <span class="row-name-text">${j.l}</span>
       </div>
       <div class="task-area" style="width:${TW}px;height:${h}px">
@@ -1059,7 +1065,6 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   const pop=document.createElement('div');
   pop.id='apop';
   pop.innerHTML=`
-    <div class="apop-stripe"></div>
     <div class="apop-body">
       <div class="apop-hdr">
         <div class="apop-who">
