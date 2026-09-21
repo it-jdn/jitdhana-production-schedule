@@ -87,7 +87,7 @@ body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);
   font-size:10.5px;color:var(--text-2);font-weight:600;white-space:nowrap;
 }
 .brk-th{
-  position:absolute;top:0;bottom:0;
+  position:absolute;top:0;bottom:0;overflow:hidden;
   background:#fef3f2;
   border-left:1px dashed var(--border-s);
   border-right:1px dashed var(--border-s);
@@ -370,7 +370,7 @@ const LG=[
 ];
 
 let SCALE=2, OFFSET=0;
-const BRK_VIS=30; // visual px for break zone
+const BRK_VIS=44; // visual px for break zone
 function tL(m){
   if(m<=BREAK_S) return(m-DAY_START)*SCALE;
   if(m>=BREAK_E) return(m-DAY_START)*SCALE-OFFSET;
