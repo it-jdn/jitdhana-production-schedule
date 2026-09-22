@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600&family=Sarabun:wght@400;500;600;700&display=swap">
-<title>ตารางผู้ปฏิบัติงาน</title>
+<title>ตารางเวลาการทำงานของผู้ปฏิบัติงาน</title>
 <style>
 :root {
   --bg: #fff;
@@ -12,7 +12,7 @@
   --sf-dim: #f8f9fa;
   --sf-hover: #f1f3f4;
   --border: #dadce0;
-  --name-w: 88px;
+  --name-w: 84px;
   --border-s: #bdc1c6;
   --text: #202124;
   --text-2: #5f6368;
@@ -163,20 +163,20 @@ body{
   position:sticky;top:0;z-index:50;
   background:var(--surface);
   border-bottom:1px solid var(--border);
-  display:flex;height:var(--th-h);
+  display:flex;height:var(--th-h);flex-shrink:0;
   box-shadow:0 1px 4px rgba(60,64,67,.1);
   width:max-content;min-width:100%;
 }
 .th-name-fixed{
   width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
-  display:flex;align-items:center;justify-content:flex-start;
-  padding-left:8px;background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  padding:0 6px;background:var(--surface);
   position:sticky;left:0;z-index:3;overflow:hidden;
 }
 .th-name-fixed span{
   font-size:9.5px;font-weight:600;color:var(--text-3);
-  letter-spacing:.04em;text-transform:uppercase;
+  letter-spacing:.04em;text-transform:uppercase;text-align:center;
 }
 .th-axis-clip{flex:0 0 auto;overflow:hidden;position:relative;height:100%;z-index:0;}
 .th-axis-inner{position:relative;height:100%;}
@@ -190,27 +190,28 @@ body{
 }
 .slot{
   position:absolute;top:0;bottom:0;z-index:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  overflow:hidden;pointer-events:none;padding:0 2px;line-height:1.05;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;pointer-events:none;padding:0 1px;
 }
 .slot span{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10px;color:var(--text-2);font-weight:600;white-space:nowrap;
+  display:inline-block;
+  font-family:'Sarabun',sans-serif;
+  font-size:9px;color:var(--text-2);font-weight:600;white-space:nowrap;
+  letter-spacing:-.03em;transform-origin:center;
 }
-.slot .slot-dash{font-size:7.5px;line-height:1;opacity:.65;font-weight:500;}
 .brk-th{
   position:absolute;top:0;bottom:0;overflow:hidden;z-index:0;
   background:#fef3f2;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;padding:0 2px;line-height:1.05;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 1px;
   box-shadow:inset 1px 0 0 var(--border-s),inset -1px 0 0 var(--border-s);
 }
 .brk-th span{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10px;font-weight:600;color:#c5221f;
-  letter-spacing:-.03em;white-space:nowrap;
+  display:inline-block;
+  font-family:'Sarabun',sans-serif;
+  font-size:9px;font-weight:600;color:#c5221f;
+  letter-spacing:-.03em;white-space:nowrap;transform-origin:center;
 }
-.brk-th .brk-dash{font-size:8px;line-height:1;opacity:.75;font-weight:500;}
 
 /* ─── Grid ─── */
 .view-stage{
@@ -221,9 +222,19 @@ body{
   touch-action:pan-x pan-y;
   padding-bottom:env(safe-area-inset-bottom,0px);
   position:relative;z-index:0;isolation:isolate;
+  display:flex;flex-direction:column;
 }
-.grid-inner{min-width:max-content;}
-.row{display:flex;height:var(--row-h);border-bottom:1px solid var(--border);}
+.grid-inner{
+  min-width:max-content;
+  flex:1 1 auto;
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+.row{
+  display:flex;flex:1 1 0;
+  min-height:var(--row-h);height:auto;
+  border-bottom:1px solid var(--border);
+}
 .row-name{
   width:var(--name-w);flex-shrink:0;
   border-right:1px solid var(--border);
@@ -245,7 +256,8 @@ body{
 }
 .task-area{
   position:relative;background:var(--surface);cursor:crosshair;
-  overflow:hidden;flex-shrink:0;touch-action:pan-x pan-y;
+  overflow:hidden;flex-shrink:0;align-self:stretch;
+  touch-action:pan-x pan-y;
   box-shadow:inset 1px 0 0 rgba(218,220,224,.7),inset -1px 0 0 rgba(218,220,224,.7);
 }
 .task-area:hover{background:#f8fbff;}
@@ -308,7 +320,8 @@ body{
 .row-name{transition:opacity .2s,filter .2s;}
 .task span{
   font-family:'Sarabun',sans-serif;
-  font-size:11.5px;font-weight:500;
+  font-size:clamp(11.5px,.72vw + .4vh,16px);
+  font-weight:500;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
 .ghost-task{
@@ -354,7 +367,7 @@ body{
 .t-spin:focus-within{border-color:var(--accent);}
 .t-part{
   width:28px;border:none;background:transparent;outline:none;
-  font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;
+  font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;
   color:var(--text);text-align:center;padding:0;letter-spacing:.02em;
 }
 .t-colon{color:var(--text-2);font-size:14px;font-weight:600;font-family:'IBM Plex Mono',monospace;user-select:none;}
@@ -480,7 +493,7 @@ html.vt-enter-right .view-stage{animation:vt-in-r .34s ease;}
       <img class="logo-img" src="jdn-logo.png?v=5" alt="JITDHANA">
     </div>
     <div class="logo-text">
-      <span class="app-title">ตารางงานผลิตสินค้าครัวกลาง</span>
+      <span class="app-title">ตารางเวลาการทำงานของผู้ปฏิบัติงาน</span>
       <span class="app-sub">บริษัท จิตต์ธนา จำกัด</span>
     </div>
   </div>
@@ -1129,7 +1142,7 @@ function build(){
   }
   function slotHtml(s,e){
     const x=tPx(s), w=Math.max(0,tPx(e)-x);
-    return `<div class="slot" style="left:${x}px;width:${w}px"><span>${tickLabel(s)}</span><span class="slot-dash">–</span><span>${tickLabel(e)}</span></div>`;
+    return `<div class="slot" style="left:${x}px;width:${w}px"><span>${tickLabel(s)}-${tickLabel(e)}</span></div>`;
   }
 
   let ticks='';
@@ -1152,7 +1165,13 @@ function build(){
   document.getElementById('th-inner').style.transform='';
   document.getElementById('th-inner').innerHTML=
     ticks+slots+
-    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>12:30</span><span class="brk-dash">–</span><span>13:15</span></div>`;
+    `<div class="brk-th" style="left:${bL}px;width:${bW}px"><span>12:30-13:15</span></div>`;
+  document.querySelectorAll('#th-inner .slot span, #th-inner .brk-th span').forEach(sp=>{
+    sp.style.transform='';
+    const max=sp.parentElement.clientWidth-4;
+    const w=sp.scrollWidth;
+    if(w>max && max>8) sp.style.transform=`scale(${Math.max(.7,max/w)})`;
+  });
 
   // Rows
   const tip=document.getElementById('tip');
