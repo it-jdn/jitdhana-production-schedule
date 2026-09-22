@@ -220,6 +220,7 @@ body{
   overscroll-behavior:contain;
   touch-action:pan-x pan-y;
   padding-bottom:env(safe-area-inset-bottom,0px);
+  position:relative;z-index:0;isolation:isolate;
 }
 .grid-inner{min-width:max-content;}
 .row{display:flex;height:var(--row-h);border-bottom:1px solid var(--border);}
@@ -314,28 +315,29 @@ body{
   position:absolute;top:5px;bottom:5px;
   background:var(--accent-lt);border:1.5px solid var(--accent);
   border-radius:6px;pointer-events:none;z-index:8;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:0 3px;overflow:hidden;opacity:.85;line-height:1.05;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;overflow:hidden;opacity:.85;line-height:1;
 }
-.ghost-task.ghost-hover{opacity:.78;}
+.ghost-task.ghost-hover{opacity:.72;}
+.ghost-task.ghost-sel{opacity:1;box-shadow:0 0 0 2px rgba(26,115,232,.22);}
 .ghost-task span{
-  font-size:10px;font-weight:600;color:var(--accent);
+  font-size:11px;font-weight:600;color:var(--accent);
   white-space:nowrap;font-family:'IBM Plex Mono',monospace;
 }
-.ghost-task .slot-dash{font-size:7.5px;line-height:1;opacity:.7;font-weight:500;}
 
 /* ─── Add Popover ─── */
 #apop{
-  position:fixed;z-index:300;width:300px;
-  background:var(--surface);border-radius:16px;overflow:hidden;
+  position:fixed;z-index:500;width:320px;
+  background:var(--surface);border-radius:16px;overflow:auto;
+  font-family:'Sarabun',sans-serif;
   box-shadow:0 4px 6px -1px rgba(60,64,67,.25),0 10px 28px 4px rgba(60,64,67,.18);
   animation:popIn .14s cubic-bezier(.22,1,.36,1);
 }
 @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(-6px);}to{opacity:1;transform:none;}}
 .apop-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;}
 .apop-hdr{display:flex;align-items:center;justify-content:space-between;}
-.apop-who{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
-.apop-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:600;color:#5f6368;font-family:'IBM Plex Sans Thai',sans-serif;line-height:1;background:#fff;box-shadow:inset 0 0 0 1px #dadce0;}
+.apop-title{font-size:16px;font-weight:600;color:var(--text);}
+.apop-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:600;color:#5f6368;font-family:'Sarabun',sans-serif;line-height:1;background:#fff;box-shadow:inset 0 0 0 1px #dadce0;}
 .apop-x{
   background:none;border:none;color:var(--text-3);cursor:pointer;
   font-size:18px;line-height:1;border-radius:50%;
@@ -362,7 +364,7 @@ body{
 .warn-ovlp{background:#fef7e0;color:#b06000;}
 .apop-name{
   border:none;border-bottom:2px solid var(--border);
-  padding:8px 0;font-size:14px;font-family:'IBM Plex Sans Thai',sans-serif;
+  padding:8px 0;font-size:14px;font-family:'Sarabun',sans-serif;
   color:var(--text);outline:none;width:100%;background:transparent;
   transition:border-color .15s;
 }
@@ -370,32 +372,46 @@ body{
 .apop-name::placeholder{color:var(--text-3);}
 .apop-name.apop-err{border-color:var(--red);animation:shake .2s;}
 @keyframes shake{0%,100%{transform:none;}33%{transform:translateX(-4px);}66%{transform:translateX(4px);}}
-.apop-cat-lbl{font-size:10.5px;font-weight:600;color:var(--text-3);letter-spacing:.07em;text-transform:uppercase;}
-.apop-cats{display:flex;flex-wrap:wrap;gap:6px;}
-.apop-cat{
-  font-size:11px;font-weight:600;font-family:'IBM Plex Sans Thai',sans-serif;
-  padding:4px 11px;border-radius:20px;cursor:pointer;
-  background:var(--cg,#f1f3f4);color:var(--cf,#5f6368);
-  border:1.5px solid transparent;transition:border-color .1s,box-shadow .1s;
+.apop-who-block{display:flex;flex-direction:column;gap:8px;}
+.apop-who-lbl{font-size:12px;font-weight:600;color:var(--text-2);}
+.apop-who-list{display:flex;flex-direction:column;gap:8px;}
+.apop-who-row{display:flex;align-items:center;gap:8px;}
+.apop-who-sel{
+  flex:1;min-width:0;border:none;border-bottom:2px solid var(--border);
+  background:transparent;outline:none;cursor:pointer;
+  font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;
+  color:var(--text);padding:6px 0;
 }
-.apop-cat:hover{border-color:var(--cb,#9aa0a6);}
-.apop-cat-sel{border-color:var(--cb,#9aa0a6)!important;box-shadow:0 0 0 3px rgba(26,115,232,.15);}
+.apop-who-sel:focus{border-color:var(--accent);}
+.apop-who-rm{
+  background:none;border:none;color:var(--text-3);cursor:pointer;
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.apop-who-rm:hover{background:var(--sf-dim);color:var(--text-2);}
+.apop-who-row:only-child .apop-who-rm{visibility:hidden;pointer-events:none;}
+.apop-who-add{
+  align-self:flex-start;background:none;border:none;cursor:pointer;
+  color:var(--accent);font-family:'Sarabun',sans-serif;
+  font-size:13px;font-weight:600;padding:2px 0;
+}
+.apop-who-add:hover{color:var(--accent-dk);}
 .apop-footer{display:flex;gap:6px;justify-content:flex-end;padding-top:2px;}
 .apop-cancel{
   background:transparent;color:var(--accent);border:none;border-radius:4px;
   padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;
-  font-family:'IBM Plex Sans Thai',sans-serif;transition:background .1s;
+  font-family:'Sarabun',sans-serif;transition:background .1s;
 }
 .apop-cancel:hover{background:var(--accent-lt);}
 .apop-save{
   background:var(--accent);color:#fff;border:none;border-radius:4px;
   padding:9px 22px;font-size:14px;font-weight:600;cursor:pointer;
-  font-family:'IBM Plex Sans Thai',sans-serif;transition:background .1s;
+  font-family:'Sarabun',sans-serif;transition:background .1s;
 }
 .apop-save:hover{background:var(--accent-dk);}
 
 #tip{
-  position:fixed;z-index:200;pointer-events:none;display:none;
+  position:fixed;z-index:450;pointer-events:none;display:none;
   background:#3c4043;color:#fff;font-size:12px;line-height:1.5;
   padding:8px 12px;border-radius:8px;box-shadow:0 2px 6px rgba(60,64,67,.3);
   max-width:260px;white-space:pre-line;
@@ -419,6 +435,7 @@ body{
 @media(pointer:coarse){
   .task:hover{filter:none;transform:none;}
   .ghost-task.ghost-hover{display:none!important;}
+  #tip{font-size:13px;padding:10px 14px;max-width:min(280px,calc(100vw - 16px));}
 }
 @media(max-height:700px){
   #apop{max-height:calc(100dvh - 24px);overflow:auto;}
@@ -430,9 +447,11 @@ body{
 .topbar{view-transition-name:app-topbar;}
 .view-switch a.on{view-transition-name:view-pill;}
 .view-stage{view-transition-name:app-stage;}
+#apop{view-transition-name:app-apop;}
 ::view-transition-group(app-topbar){z-index:6;}
 ::view-transition-group(view-pill){z-index:7;}
 ::view-transition-group(app-stage){z-index:2;}
+::view-transition-group(app-apop){z-index:20;}
 @keyframes vt-out-l{to{opacity:0;transform:translateX(-40px);}}
 @keyframes vt-in-r{from{opacity:0;transform:translateX(40px);}}
 @keyframes vt-out-r{to{opacity:0;transform:translateX(40px);}}
@@ -776,12 +795,39 @@ function slotAt(m){
 // ─── Drag & Popover state ───
 let drag=null, ghostEl=null, outHandler=null, hoverGhost=null;
 function canHover(){return window.matchMedia('(hover:hover) and (pointer:fine)').matches;}
+function hideTip(){
+  const t=document.getElementById('tip');
+  if(t) t.style.display='none';
+}
+function placeTipAt(x,y){
+  const tip=document.getElementById('tip');
+  if(!tip||tip.style.display==='none') return;
+  const tw=tip.offsetWidth, th=tip.offsetHeight, gap=8, pad=8;
+  let px=x+gap, py=y+gap;
+  if(px+tw>innerWidth-pad) px=x-tw-gap;
+  if(py+th>innerHeight-pad) py=y-th-gap;
+  tip.style.left=Math.max(pad,px)+'px';
+  tip.style.top=Math.max(pad,py)+'px';
+}
+function showTapTip(el,e){
+  const tip=document.getElementById('tip');
+  if(!tip||!el) return;
+  const src=el.closest('.task')||el.closest('.who-out')?.previousElementSibling||el;
+  const text=src.dataset.tip||el.dataset.tip;
+  if(!text) return;
+  tip.textContent=text;
+  tip.style.display='block';
+  const r=el.getBoundingClientRect();
+  const x=(e&&e.clientX!=null)?e.clientX:(r.left+r.width/2);
+  const y=(e&&e.clientY!=null)?e.clientY:r.bottom;
+  placeTipAt(x,y);
+}
 
 function hideHoverGhost(){
   if(hoverGhost){hoverGhost.remove();hoverGhost=null;}
 }
-function ghostLabel(s,e){
-  return`<span>${minToTime(s)}</span><span class="slot-dash">–</span><span>${minToTime(e)}</span>`;
+function ghostLabel(s){
+  return`<span>${minToTime(s)}</span>`;
 }
 function showHoverSlot(area,s,e){
   if(!hoverGhost||hoverGhost.parentNode!==area){
@@ -792,44 +838,25 @@ function showHoverSlot(area,s,e){
   }
   hoverGhost.style.left=tL(s)+'px';
   hoverGhost.style.width=Math.max(tL(e)-tL(s),6)+'px';
-  hoverGhost.innerHTML=ghostLabel(s,e);
+  hoverGhost.innerHTML=ghostLabel(s);
 }
 
-function closePopover(){
+function closePopover(keepGhost){
   const p=document.getElementById('apop');
   if(p)p.remove();
-  if(ghostEl){ghostEl.remove();ghostEl=null;}
+  if(!keepGhost && ghostEl){ghostEl.remove();ghostEl=null;}
   hideHoverGhost();
   if(outHandler){document.removeEventListener('mousedown',outHandler);outHandler=null;}
 }
 
-function showPopover(workerIdx, sMin, eMin, anchorRect){
-  closePopover();
-  const w=WORKERS[workerIdx];
-  const avColor=AV_BG;
-  const catKeys=Object.keys(C).filter(k=>k!=='other');
-
-  function validate(s,e){
-    const brk=s<BREAK_E&&e>BREAK_S;
-    const ovlp=w.t.some(tk=>{const ts=toMin(tk.s),te=toMin(tk.e);return s<te&&e>ts;});
-    return{brk,ovlp};
-  }
-
-  const catHtml=catKeys.map((k,i)=>{
-    const v=C[k];
-    return `<button class="apop-cat${i===0?' apop-cat-sel':''}" data-k="${k}"
-      style="--cb:${v.bd};--cg:${v.bg};--cf:${v.fg}">${CN[k]||k}</button>`;
-  }).join('');
-
+function showPopover(workerIdx, sMin, eMin, anchorRect, keepGhost){
+  closePopover(keepGhost);
   const pop=document.createElement('div');
   pop.id='apop';
   pop.innerHTML=`
     <div class="apop-body">
       <div class="apop-hdr">
-        <div class="apop-who">
-          <div class="apop-avatar" style="background:${avColor}">${initial(w.n)}</div>
-          ${w.n}
-        </div>
+        <div class="apop-title">เพิ่มงาน</div>
         <button class="apop-x" title="ปิด">✕</button>
       </div>
       <div class="apop-times">
@@ -847,27 +874,84 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
       </div>
       <div id="apop-warns"></div>
       <input class="apop-name" id="apop-n" type="text" placeholder="ชื่องาน / เมนู / Batch No." autocomplete="off">
-      <div>
-        <div class="apop-cat-lbl" style="margin-bottom:7px;">ประเภทงาน</div>
-        <div class="apop-cats">${catHtml}</div>
+      <div class="apop-who-block">
+        <div class="apop-who-lbl">ผู้ปฏิบัติงาน</div>
+        <div class="apop-who-list"></div>
+        <button type="button" class="apop-who-add">+ เพิ่มผู้ปฏิบัติงาน</button>
       </div>
       <div class="apop-footer">
         <button class="apop-cancel">ยกเลิก</button>
-        <button class="apop-save">สร้าง</button>
+        <button class="apop-save">เพิ่มงาน</button>
       </div>
     </div>`;
   document.body.appendChild(pop);
 
+  const whoList=pop.querySelector('.apop-who-list');
+  const whoAdd=pop.querySelector('.apop-who-add');
+
+  function selectedIdxs(){
+    return [...whoList.querySelectorAll('.apop-who-sel')].map(s=>parseInt(s.value,10));
+  }
+  function unusedIdxs(){
+    const taken=new Set(selectedIdxs());
+    return WORKERS.map((_,i)=>i).filter(i=>!taken.has(i));
+  }
+  function refreshWho(){
+    const taken=selectedIdxs();
+    whoList.querySelectorAll('.apop-who-row').forEach(row=>{
+      const sel=row.querySelector('.apop-who-sel');
+      const cur=parseInt(sel.value,10);
+      sel.innerHTML=WORKERS.map((w,i)=>{
+        if(taken.includes(i)&&i!==cur) return '';
+        return `<option value="${i}"${i===cur?' selected':''}>${w.n}</option>`;
+      }).join('');
+      row.querySelector('.apop-avatar').textContent=initial(WORKERS[cur].n);
+    });
+    whoAdd.style.display=unusedIdxs().length?'':'none';
+    whoList.querySelectorAll('.apop-who-rm').forEach(b=>{
+      b.hidden=whoList.children.length<=1;
+    });
+  }
+  function addWhoRow(idx){
+    const pick=idx!=null?idx:unusedIdxs()[0];
+    if(pick==null) return;
+    const row=document.createElement('div');
+    row.className='apop-who-row';
+    row.innerHTML=`
+      <div class="apop-avatar">${initial(WORKERS[pick].n)}</div>
+      <select class="apop-who-sel">${WORKERS.map((w,i)=>`<option value="${i}">${w.n}</option>`).join('')}</select>
+      <button type="button" class="apop-who-rm" title="ลบ">✕</button>`;
+    row.querySelector('.apop-who-sel').value=String(pick);
+    row.querySelector('.apop-who-sel').addEventListener('change',()=>{
+      refreshWho();
+      updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em'));
+    });
+    row.querySelector('.apop-who-rm').addEventListener('click',()=>{
+      if(whoList.children.length<=1) return;
+      row.remove();
+      refreshWho();
+      updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em'));
+      placePopover();
+    });
+    whoList.appendChild(row);
+    refreshWho();
+  }
+
+  function validate(s,e){
+    const brk=s<BREAK_E&&e>BREAK_S;
+    const names=selectedIdxs().filter(idx=>{
+      return WORKERS[idx].t.some(tk=>{const ts=toMin(tk.s),te=toMin(tk.e);return s<te&&e>ts;});
+    }).map(idx=>WORKERS[idx].n);
+    return{brk,ovlp:names.length>0,names};
+  }
   function updateWarns(s,e){
     const v=validate(s,e);
     let h='';
     if(v.brk) h+=`<div class="apop-warn warn-brk">🚫 คร่อมพักเบรก 12:30–13:15</div>`;
-    if(v.ovlp) h+=`<div class="apop-warn warn-ovlp">⚠️ ทับซ้อนกับงานที่มีอยู่</div>`;
+    if(v.ovlp) h+=`<div class="apop-warn warn-ovlp">⚠️ ทับซ้อนกับงานที่มีอยู่ (${v.names.join(', ')})</div>`;
     document.getElementById('apop-warns').innerHTML=h;
   }
-  updateWarns(sMin,eMin);
 
-  // Position
   function placePopover(){
     const vv=window.visualViewport;
     const vw=vv?vv.width:innerWidth, vh=vv?vv.height:innerHeight;
@@ -881,13 +965,15 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     pop.style.left=px+'px';
     pop.style.top=py+'px';
   }
-  placePopover();
-
   function readSpin(hId,mId){
     const h=Math.min(23,Math.max(0,parseInt(document.getElementById(hId).value)||0));
     const m=Math.min(59,Math.max(0,parseInt(document.getElementById(mId).value)||0));
     return h*60+m;
   }
+
+  addWhoRow(workerIdx);
+  updateWarns(sMin,eMin);
+  placePopover();
 
   ['apop-sh','apop-sm','apop-eh','apop-em'].forEach(id=>{
     const el=document.getElementById(id);
@@ -901,14 +987,10 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     });
   });
 
-  // Cat selection
-  let selCat=catKeys[0];
-  pop.querySelectorAll('.apop-cat').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      pop.querySelectorAll('.apop-cat').forEach(b=>b.classList.remove('apop-cat-sel'));
-      btn.classList.add('apop-cat-sel');
-      selCat=btn.dataset.k;
-    });
+  whoAdd.addEventListener('click',()=>{
+    addWhoRow();
+    updateWarns(readSpin('apop-sh','apop-sm'),readSpin('apop-eh','apop-em'));
+    placePopover();
   });
 
   function doSave(){
@@ -922,7 +1004,11 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     const s=readSpin('apop-sh','apop-sm');
     const e=readSpin('apop-eh','apop-em');
     if(e<=s)return;
-    w.t.push({s:minToTime(s),e:minToTime(e),l:name,c:selCat});
+    const idxs=[...new Set(selectedIdxs())];
+    if(!idxs.length) return;
+    idxs.forEach(idx=>{
+      WORKERS[idx].t.push({s:minToTime(s),e:minToTime(e),l:name,c:'other'});
+    });
     closePopover();build();
   }
 
@@ -989,6 +1075,7 @@ function applyPulse(){
 function setPulse(label){
   if(searchQ) return;
   pulseLabel=pulseLabel===label?null:label;
+  if(!pulseLabel) hideTip();
   applyPulse();
 }
 function setSearch(raw,scroll){
@@ -997,6 +1084,7 @@ function setSearch(raw,scroll){
   if(searchQ) sessionStorage.setItem('jobSearch',trimmed);
   else sessionStorage.removeItem('jobSearch');
   pulseLabel=null;
+  hideTip();
   applyPulse();
   if(scroll&&searchQ){
     const m=document.querySelector('.task-pulse,.row-pulse');
@@ -1103,24 +1191,26 @@ function build(){
   lastFit=gs.clientWidth;
 
   function placeTip(e){
-    if(!window.matchMedia('(hover:hover)').matches) return;
-    const tw=tip.offsetWidth, th=tip.offsetHeight, gap=8, pad=8;
-    let x=e.clientX+gap, y=e.clientY+gap;
-    if(x+tw>innerWidth-pad) x=e.clientX-tw-gap;
-    if(y+th>innerHeight-pad) y=e.clientY-th-gap;
-    tip.style.left=Math.max(pad,x)+'px';
-    tip.style.top=Math.max(pad,y)+'px';
+    if(!canHover()) return;
+    placeTipAt(e.clientX,e.clientY);
   }
   document.querySelectorAll('.task').forEach(el=>{
     el.addEventListener('mouseenter',e=>{
-      if(!window.matchMedia('(hover:hover)').matches) return;
+      if(!canHover()) return;
       tip.textContent=el.dataset.tip;tip.style.display='block';placeTip(e);
     });
     el.addEventListener('mousemove',placeTip);
-    el.addEventListener('mouseleave',()=>{tip.style.display='none';});
+    el.addEventListener('mouseleave',()=>{
+      if(!canHover()) return;
+      hideTip();
+    });
     el.addEventListener('click',e=>{
       e.stopPropagation();
       setPulse(el.dataset.l);
+      if(!canHover()){
+        if(pulseLabel) showTapTip(el,e);
+        else hideTip();
+      }
     });
   });
   applyPulse();
@@ -1146,8 +1236,8 @@ function build(){
       hideHoverGhost();
       const sMin=sl.s, eMin=sl.e;
       const ghost=document.createElement('div');
-      ghost.className='ghost-task';
-      ghost.innerHTML=ghostLabel(sMin,eMin);
+      ghost.className='ghost-task ghost-sel';
+      ghost.innerHTML=ghostLabel(sMin);
       ghost.style.left=tL(sMin)+'px';
       ghost.style.width=(tL(eMin)-tL(sMin))+'px';
       area.appendChild(ghost);
@@ -1163,15 +1253,13 @@ document.addEventListener('mousemove',e=>{
   const rect=drag.area.getBoundingClientRect();
   const curMin=clamp(snap(Math.max(drag.sMin+15,xToMin(e.clientX-rect.left))));
   drag.curMin=curMin;
-  drag.ghost.style.width=Math.max(tL(curMin)-tL(drag.sMin),6)+'px';
-  drag.ghost.innerHTML=ghostLabel(drag.sMin,curMin);
 });
 
 document.addEventListener('mouseup',e=>{
   if(!drag)return;
   const d=drag;drag=null;
   const ghostRect=d.ghost.getBoundingClientRect();
-  showPopover(d.workerIdx,d.sMin,d.curMin,ghostRect);
+  showPopover(d.workerIdx,d.sMin,d.curMin,ghostRect,true);
 });
 
 document.getElementById('btn-create').addEventListener('click',e=>{
