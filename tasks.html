@@ -268,10 +268,17 @@ body{
 .task{
   position:absolute;
   border-radius:4px;display:flex;align-items:center;
-  padding:0 5px;cursor:default;overflow:hidden;
+  padding:0 5px;cursor:grab;overflow:hidden;
   z-index:4;box-shadow:0 1px 2px rgba(0,0,0,.12);gap:3px;
   transition:filter .2s,opacity .2s,box-shadow .2s;
 }
+.task.task-sel{
+  outline:2.5px solid #fff;outline-offset:2px;z-index:8;
+  box-shadow:0 0 0 2px #1a73e8,0 2px 8px rgba(26,115,232,.35);
+}
+.task.task-dragging{opacity:.32;cursor:grabbing;}
+body.is-task-drag{cursor:grabbing;user-select:none;}
+body.is-task-drag .view-stage{touch-action:none;}
 .task.task-pulse{
   outline:2.5px solid #fff;outline-offset:2px;
   z-index:7;overflow:visible;
@@ -430,6 +437,53 @@ body{
   padding:8px 12px;border-radius:8px;box-shadow:0 2px 6px rgba(60,64,67,.3);
   max-width:280px;white-space:pre-line;
 }
+.ghost-task{
+  position:absolute;border-radius:4px;pointer-events:none;z-index:8;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;overflow:hidden;opacity:.85;line-height:1;
+  border:1.5px solid var(--accent);background:var(--accent-lt);
+}
+.ghost-task.drop-ok{opacity:.9;}
+.ghost-task.drop-bad{opacity:.9;background:#fce8e6;border-color:#d93025;}
+.ghost-task.drop-bad span{color:#c5221f;}
+.ghost-task span{
+  font-size:11px;font-weight:600;color:var(--accent);
+  white-space:nowrap;font-family:'IBM Plex Mono',monospace;
+}
+#drag-float{
+  position:fixed;z-index:520;pointer-events:none;
+  border-radius:5px;padding:0 10px;height:32px;
+  display:flex;align-items:center;gap:6px;
+  box-shadow:0 8px 20px rgba(60,64,67,.3);
+  font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;
+  white-space:nowrap;max-width:240px;overflow:hidden;
+}
+#drag-float .df-n{overflow:hidden;text-overflow:ellipsis;}
+#drag-float .df-ncount{
+  font-size:10px;font-weight:700;background:rgba(255,255,255,.22);
+  border-radius:8px;padding:1px 6px;flex-shrink:0;
+}
+#scope{
+  position:fixed;z-index:260;left:0;top:0;
+  display:none;align-items:center;gap:4px;flex-wrap:wrap;
+  background:#fff;border-radius:20px;padding:4px 6px 4px 10px;
+  box-shadow:0 2px 8px rgba(32,33,36,.22),0 1px 2px rgba(0,0,0,.12);
+  font-family:'Sarabun',sans-serif;
+  pointer-events:auto;
+  max-width:min(340px,calc(100vw - 16px));
+}
+#scope.show{display:flex;}
+#scope .scope-lbl{font-size:11px;font-weight:600;color:var(--text-2);padding-right:2px;white-space:nowrap;}
+#scope .scope-sep{width:1px;height:16px;background:var(--border);margin:0 2px;flex-shrink:0;}
+#scope button{
+  border:none;background:transparent;cursor:pointer;
+  font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;
+  color:var(--text-2);padding:5px 10px;border-radius:14px;white-space:nowrap;
+}
+#scope button.on{background:var(--accent);color:#fff;}
+#scope button[data-act="edit"]:hover{background:var(--accent-lt);color:var(--accent-dk);}
+#scope button[data-act="del"]{color:var(--red);}
+#scope button[data-act="del"]:hover{background:#fce8e6;}
 
 @media(max-width:900px){
   :root{--name-w:152px;}
@@ -533,6 +587,14 @@ html.vt-enter-right .view-stage{animation:vt-in-r .34s ease;}
 </div>
 
 <div id="tip"></div>
+<div id="scope" aria-label="เครื่องมืองาน">
+  <span class="scope-lbl">ย้าย</span>
+  <button type="button" data-mode="one">งานนี้</button>
+  <button type="button" data-mode="all">ทั้งหมด</button>
+  <span class="scope-sep"></span>
+  <button type="button" data-act="edit">แก้ไข</button>
+  <button type="button" data-act="del">ลบ</button>
+</div>
 <div class="search-bubble" id="search-wrap">
   <button type="button" class="search-fab" id="search-fab" aria-label="ค้นหางานผลิต" title="ค้นหางานผลิต">
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -699,6 +761,8 @@ const LANE_H=44, ROW_PAD=0, BAR_INSET=5;
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minToTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
 function pad2(n){return String(n).padStart(2,'0');}
+function snap(m,step=15){return Math.round(m/step)*step;}
+function clamp(m){return Math.max(DAY_START,Math.min(m,DAY_END));}
 
 const C={
   dist:   {bg:'#4285F4'},
@@ -856,6 +920,7 @@ function tintHex(hex,amt=0.84){
 let SCALE=2, lastFit=-1;
 function tL(m){return(m-DAY_START)*SCALE;}
 function tPx(m){return Math.round(tL(m));}
+function xToMin(x){return DAY_START+x/SCALE;}
 function axisMarks(){
   const t=[];
   for(let m=DAY_START;m<=BREAK_S;m+=30) t.push(m);
@@ -863,8 +928,187 @@ function axisMarks(){
   for(let m=14*60;m<=DAY_END;m+=30) t.push(m);
   return t;
 }
+function slotAt(m){
+  if(m<DAY_START||m>=DAY_END) return null;
+  if(m>=BREAK_S&&m<BREAK_E) return null;
+  if(m<BREAK_S){
+    const s=DAY_START+Math.floor((m-DAY_START)/30)*30;
+    return{s,e:Math.min(s+30,BREAK_S)};
+  }
+  if(m<14*60) return{s:BREAK_E,e:14*60};
+  const s=14*60+Math.floor((m-14*60)/30)*30;
+  return{s,e:Math.min(s+30,DAY_END)};
+}
 
-let pulseWho=null;
+let pulseWho=null, pulseLabel=null, pulseS=null, pulseE=null, selMode='one';
+let dropGhost=null, moveDrag=null, movePend=null, holdTimer=null, didMove=false;
+
+function countLabel(l){
+  let n=0;
+  WORKERS.forEach(w=>w.t.forEach(tk=>{if(tk.l===l) n++;}));
+  return n;
+}
+function movingItems(label, mode, s, e){
+  const out=[];
+  WORKERS.forEach((w,i)=>w.t.forEach((tk,ti)=>{
+    if(tk.l!==label) return;
+    if(mode==='all' || (tk.s===s && tk.e===e)) out.push({wi:i,ti,tk});
+  }));
+  return out;
+}
+function occupied(wi,s,e,skip){
+  return WORKERS[wi].t.some((tk,ti)=>{
+    if(skip.some(x=>x.wi===wi&&x.ti===ti)) return false;
+    const ts=toMin(tk.s), te=toMin(tk.e);
+    return s<te && e>ts;
+  });
+}
+function clipRange(s,e){
+  if(s>=BREAK_S&&s<BREAK_E) return null;
+  if(s<DAY_START||s>=DAY_END) return null;
+  if(s<BREAK_S && e>BREAK_S) e=BREAK_S;
+  if(e>DAY_END) e=DAY_END;
+  if(e-s<15) return null;
+  if(s<BREAK_E && e>BREAK_S && !(s<BREAK_S && e<=BREAK_S)) return null;
+  return {s,e};
+}
+function proposedMove(fromS, fromE, label, ns, mode){
+  const items=movingItems(label, mode, fromS, fromE);
+  if(!items.length) return {ok:false,plans:[]};
+  const src=items.find(x=>x.tk.s===fromS&&x.tk.e===fromE)||items[0];
+  const delta=ns-toMin(src.tk.s);
+  const plans=[];
+  for(const it of items){
+    const s0=toMin(it.tk.s);
+    const dur=toMin(it.tk.e)-s0;
+    const start=mode==='all'?s0+delta:ns;
+    const rng=clipRange(start,start+dur);
+    if(!rng) return {ok:false,plans};
+    if(occupied(it.wi,rng.s,rng.e,items)) return {ok:false,plans};
+    plans.push({from:it,destWi:it.wi,s:rng.s,e:rng.e});
+  }
+  for(let i=0;i<plans.length;i++){
+    for(let j=i+1;j<plans.length;j++){
+      if(plans[i].destWi!==plans[j].destWi) continue;
+      if(plans[i].s<plans[j].e && plans[i].e>plans[j].s) return {ok:false,plans};
+    }
+  }
+  return {ok:true,plans};
+}
+function applyPlans(plans){
+  const ordered=[...plans].sort((a,b)=>a.from.wi-b.from.wi||b.from.ti-a.from.ti);
+  const bag=[];
+  ordered.forEach(p=>{
+    const tk=WORKERS[p.from.wi].t.splice(p.from.ti,1)[0];
+    bag.push({p,tk});
+  });
+  bag.forEach(({p,tk})=>{
+    WORKERS[p.destWi].t.push({...tk,s:minToTime(p.s),e:minToTime(p.e)});
+  });
+}
+function hideDropGhost(){
+  if(dropGhost){dropGhost.remove();dropGhost=null;}
+}
+function showDropGhost(area,s,e,ok,top,h){
+  if(!dropGhost||dropGhost.parentNode!==area){
+    hideDropGhost();
+    dropGhost=document.createElement('div');
+    dropGhost.className='ghost-task';
+    area.appendChild(dropGhost);
+  }
+  dropGhost.className='ghost-task '+(ok?'drop-ok':'drop-bad');
+  dropGhost.style.left=tL(s)+'px';
+  dropGhost.style.width=Math.max(tL(e)-tL(s),8)+'px';
+  dropGhost.style.top=(top||5)+'px';
+  dropGhost.style.height=(h||(LANE_H-BAR_INSET*2))+'px';
+  dropGhost.innerHTML=`<span>${minToTime(s)}${ok?'':' ✕'}</span>`;
+}
+function areaFromPoint(x,y){
+  const els=document.elementsFromPoint(x,y);
+  for(const el of els){
+    if(el.id==='drag-float'||el.id==='scope') continue;
+    const a=el.closest&&el.closest('.task-area');
+    if(a) return a;
+  }
+  return null;
+}
+function clearHold(){
+  if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}
+}
+function removeFloat(){
+  const f=document.getElementById('drag-float');
+  if(f) f.remove();
+}
+function placeFloat(x,y){
+  const f=document.getElementById('drag-float');
+  if(!f) return;
+  f.style.left=(x+12)+'px';
+  f.style.top=(y-18)+'px';
+}
+function beginMove(pt){
+  if(moveDrag) return;
+  clearHold();
+  closePopover();
+  hideTip();
+  pulseWho=null;
+  pulseLabel=pt.l; pulseS=pt.s; pulseE=pt.e;
+  applyPulse();
+  const n=selMode==='all'?countLabel(pt.l):movingItems(pt.l,'one',pt.s,pt.e).length;
+  const f=document.createElement('div');
+  f.id='drag-float';
+  const col=jobColor(pt.l, pt.c);
+  f.style.background=col.bg;
+  f.style.color=col.fg;
+  f.innerHTML=`<span class="df-n">${pt.l}</span>${n>1?`<span class="df-ncount">${n}</span>`:''}`;
+  document.body.appendChild(f);
+  placeFloat(pt.x,pt.y);
+  document.querySelectorAll('.task').forEach(el=>{
+    const one=el.dataset.l===pt.l && el.dataset.s===pt.s && el.dataset.e===pt.e;
+    const all=el.dataset.l===pt.l;
+    if(selMode==='all'?all:one) el.classList.add('task-dragging');
+  });
+  document.body.classList.add('is-task-drag');
+  didMove=true;
+  moveDrag={s:pt.s,e:pt.e,l:pt.l,c:pt.c,top:pt.top,h:pt.h};
+  showScope();
+  updateMove(pt.x,pt.y);
+}
+function updateMove(x,y){
+  if(!moveDrag) return;
+  placeFloat(x,y);
+  const area=areaFromPoint(x,y);
+  if(!area||area.dataset.l!==moveDrag.l){hideDropGhost();moveDrag.plan=null;return;}
+  const rect=area.getBoundingClientRect();
+  const sl=slotAt(xToMin(x-rect.left));
+  if(!sl){hideDropGhost();moveDrag.plan=null;return;}
+  const plan=proposedMove(moveDrag.s,moveDrag.e,moveDrag.l,sl.s,selMode);
+  moveDrag.plan=plan;
+  const vis=plan.plans[0];
+  if(vis) showDropGhost(area,vis.s,vis.e,plan.ok,moveDrag.top,moveDrag.h);
+  else showDropGhost(area,sl.s,sl.e,false,moveDrag.top,moveDrag.h);
+}
+function endMove(commit){
+  const d=moveDrag;
+  moveDrag=null;
+  movePend=null;
+  clearHold();
+  hideDropGhost();
+  removeFloat();
+  document.body.classList.remove('is-task-drag');
+  if(commit && d && d.plan && d.plan.ok && d.plan.plans.length){
+    const first=d.plan.plans[0];
+    applyPlans(d.plan.plans);
+    pulseLabel=d.l;
+    pulseS=minToTime(first.s);
+    pulseE=minToTime(first.e);
+    build();
+    setTimeout(()=>{didMove=false;},0);
+    return;
+  }
+  document.querySelectorAll('.task-dragging').forEach(el=>el.classList.remove('task-dragging'));
+  setTimeout(()=>{didMove=false;},0);
+}
+
 function normQ(s){return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();}
 function hit(q,...vals){return !!q&&vals.some(v=>normQ(v).includes(q));}
 const searchInput=document.getElementById('job-search');
@@ -890,18 +1134,73 @@ function refreshSearchChrome(){
   searchWrap.classList.toggle('no-hit',!!searchQ&&!any);
   if(searchQ) searchWrap.classList.add('open');
 }
+function scopeAnchor(){
+  const sels=[...document.querySelectorAll('.task.task-sel')];
+  if(!sels.length) return null;
+  const primary=sels.find(el=>el.dataset.l===pulseLabel && el.dataset.s===pulseS && el.dataset.e===pulseE)||sels[0];
+  const vis=sels.filter(el=>{
+    const r=el.getBoundingClientRect();
+    return r.bottom>8 && r.top<innerHeight-8 && r.right>8 && r.left<innerWidth-8;
+  });
+  if(vis.includes(primary)) return primary;
+  return vis[0]||null;
+}
+function placeScope(el){
+  const anchor=scopeAnchor();
+  if(!anchor){el.classList.remove('show');return;}
+  const r=anchor.getBoundingClientRect();
+  const th=document.querySelector('.th-band');
+  const thBottom=th?th.getBoundingClientRect().bottom:0;
+  const vv=window.visualViewport;
+  const vw=vv?vv.width:innerWidth, vh=vv?vv.height:innerHeight;
+  const ox=vv?vv.offsetLeft:0, oy=vv?vv.offsetTop:0;
+  const pad=8, gap=6, pw=el.offsetWidth, ph=el.offsetHeight;
+  let left=r.left;
+  let top=r.top-ph-gap;
+  if(top<thBottom+2 || top<oy+pad){
+    left=r.right+gap;
+    top=r.top+(r.height-ph)/2;
+    if(left+pw>ox+vw-pad){
+      left=r.left;
+      top=r.bottom+gap;
+    }
+  }
+  left=Math.max(ox+pad,Math.min(left,ox+vw-pw-pad));
+  top=Math.max(oy+pad,Math.min(top,oy+vh-ph-pad));
+  el.style.left=left+'px';
+  el.style.top=top+'px';
+}
+function showScope(){
+  const el=document.getElementById('scope');
+  if(!el) return;
+  if(!pulseLabel||searchQ||moveDrag||document.getElementById('apop')){el.classList.remove('show');return;}
+  const n=countLabel(pulseLabel);
+  const allBtn=el.querySelector('[data-mode="all"]');
+  if(allBtn) allBtn.textContent=n>1?`ทั้งหมด (${n})`:'ทั้งหมด';
+  el.querySelectorAll('button[data-mode]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.mode===selMode);
+  });
+  el.classList.add('show');
+  placeScope(el);
+}
 function applyPulse(){
   const q=searchQ;
-  const on=!!q||!!pulseWho;
+  const on=!!q||!!pulseWho||!!pulseLabel;
   const gi=document.getElementById('gi');
   if(gi) gi.classList.toggle('is-pulsing',on);
   document.querySelectorAll('.task').forEach(el=>{
     const names=(el.dataset.who||'').split('|').filter(Boolean);
-    const match=q?hit(q,el.dataset.l,...names):(on&&names.includes(pulseWho));
+    let match=false;
+    if(q) match=hit(q,el.dataset.l,...names);
+    else if(pulseLabel){
+      if(selMode==='all') match=el.dataset.l===pulseLabel;
+      else match=el.dataset.l===pulseLabel && el.dataset.s===pulseS && el.dataset.e===pulseE;
+    } else if(pulseWho) match=names.includes(pulseWho);
     el.classList.toggle('task-pulse',match);
+    el.classList.toggle('task-sel',!q&&!!pulseLabel&&match);
   });
   document.querySelectorAll('.bar-who, .who-out-n').forEach(el=>{
-    const match=q?hit(q,el.dataset.n):(on&&el.dataset.n===pulseWho);
+    const match=q?hit(q,el.dataset.n):(!!pulseWho&&el.dataset.n===pulseWho);
     el.classList.toggle('who-pulse',match);
   });
   document.querySelectorAll('.who-out').forEach(el=>{
@@ -909,15 +1208,62 @@ function applyPulse(){
   });
   document.querySelectorAll('.row').forEach(row=>{
     const job=row.querySelector('.row-name-text')?.textContent||'';
-    const jobHit=!!q&&hit(q,job);
+    const jobHit=(!!q&&hit(q,job))||(!!pulseLabel&&job===pulseLabel);
     const nameEl=row.querySelector('.row-name');
-    if(nameEl) nameEl.classList.toggle('row-pulse',jobHit);
+    if(nameEl) nameEl.classList.toggle('row-pulse',!!q&&hit(q,job));
     row.classList.toggle('row-dim',on&&!jobHit&&!row.querySelector('.task-pulse'));
   });
   refreshSearchChrome();
+  showScope();
+}
+function currentItems(){
+  if(!pulseLabel) return [];
+  return movingItems(pulseLabel, selMode, pulseS, pulseE);
+}
+function deleteSelected(){
+  const items=currentItems();
+  if(!items.length) return;
+  const msg=selMode==='all'&&items.length>1
+    ? `ลบงาน “${pulseLabel}” ทั้งหมด ${items.length} รายการหรือไม่?`
+    : `ลบงาน “${pulseLabel}” หรือไม่?`;
+  if(!confirm(msg)) return;
+  [...items].sort((a,b)=>a.wi-b.wi||b.ti-a.ti).forEach(it=>{
+    WORKERS[it.wi].t.splice(it.ti,1);
+  });
+  clearSel();
+  build();
+}
+function editSelected(){
+  const items=currentItems();
+  if(!items.length) return;
+  const src=items.find(x=>x.tk.s===pulseS&&x.tk.e===pulseE)||items[0];
+  const whoIdxs=[...new Set(items.map(x=>x.wi))];
+  const anchor=scopeAnchor()||document.querySelector('.task.task-sel');
+  const rect=anchor?anchor.getBoundingClientRect():{left:innerWidth/2,top:120,width:0,height:0,bottom:120};
+  hideTip();
+  showPopover(whoIdxs[0], toMin(src.tk.s), toMin(src.tk.e), rect, {
+    name:src.tk.l, cat:src.tk.c, items, whoIdxs
+  });
+}
+function clearSel(){
+  pulseLabel=null; pulseS=null; pulseE=null; pulseWho=null;
+  hideTip();
+  applyPulse();
+}
+function selectBar(el,toggle){
+  if(searchQ) return;
+  const l=el.dataset.l, s=el.dataset.s, e=el.dataset.e;
+  if(toggle && pulseLabel===l && pulseS===s && pulseE===e){
+    clearSel();
+    return;
+  }
+  pulseWho=null;
+  pulseLabel=l; pulseS=s; pulseE=e;
+  applyPulse();
 }
 function setPulse(name){
   if(searchQ) return;
+  pulseLabel=null; pulseS=null; pulseE=null;
   pulseWho=pulseWho===name?null:name;
   if(!pulseWho) hideTip();
   applyPulse();
@@ -927,7 +1273,7 @@ function setSearch(raw,scroll){
   searchQ=normQ(trimmed);
   if(searchQ) sessionStorage.setItem('jobSearch',trimmed);
   else sessionStorage.removeItem('jobSearch');
-  pulseWho=null;
+  pulseWho=null; pulseLabel=null; pulseS=null; pulseE=null;
   hideTip();
   applyPulse();
   if(scroll&&searchQ){
@@ -956,6 +1302,8 @@ document.addEventListener('pointerdown',e=>{
 });
 
 function build(){
+  if(moveDrag) return;
+  hideDropGhost();
   const gs=document.getElementById('gs');
   const avail=Math.max(1,Math.floor(gs.clientWidth-nameW()));
   const UNIT_MIN=15, nUnits=TOTAL/UNIT_MIN;
@@ -1031,7 +1379,7 @@ function build(){
           }</div>`
         : '';
       return `<div class="task${innerFit?'':' no-name'}" style="left:${x0}px;width:${Math.max(1,x1-x0)}px;top:${top}px;height:${barH}px;background:${col.bg};"
-        data-l="${j.l.replace(/"/g,'&quot;')}"
+        data-l="${j.l.replace(/"/g,'&quot;')}" data-s="${bar.s}" data-e="${bar.e}" data-c="${bar.c}"
         data-who="${whoAttr.replace(/"/g,'&quot;')}"
         data-tip="${j.l}\n${bar.s} – ${bar.e}\n${who}">
         <div class="bar-avs">${avs}</div>
@@ -1048,7 +1396,7 @@ function build(){
         <span class="row-num">${ji+1}.</span>
         <span class="row-name-text">${j.l}</span>
       </div>
-      <div class="task-area" style="width:${TW}px;height:${h}px">
+      <div class="task-area" data-l="${j.l.replace(/"/g,'&quot;')}" style="width:${TW}px;height:${h}px">
         ${gridLines}
         ${hLines}
         <div class="brk-col" style="left:${bL}px;width:${bW}px"></div>
@@ -1067,7 +1415,7 @@ function build(){
   }
   document.querySelectorAll('.task').forEach(el=>{
     el.addEventListener('mouseenter',e=>{
-      if(!canHover()) return;
+      if(!canHover()||moveDrag) return;
       tip.textContent=el.dataset.tip;tip.style.display='block';placeTip(e);
     });
     el.addEventListener('mousemove',placeTip);
@@ -1075,15 +1423,19 @@ function build(){
       if(!canHover()) return;
       hideTip();
     });
-    el.addEventListener('click',e=>{
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0) return;
       if(e.target.closest('.bar-who')) return;
       e.stopPropagation();
-      const first=(el.dataset.who||'').split('|').filter(Boolean)[0];
-      if(first) setPulse(first);
-      if(!canHover()){
-        if(pulseWho) showTapTip(el,e);
-        else hideTip();
-      }
+      didMove=false;
+      const pt={
+        x:e.clientX,y:e.clientY,el,
+        s:el.dataset.s,e:el.dataset.e,l:el.dataset.l,c:el.dataset.c,
+        top:parseFloat(el.style.top)||5,h:el.offsetHeight
+      };
+      movePend=pt;
+      if(e.pointerType==='mouse') return;
+      holdTimer=setTimeout(()=>beginMove(pt),340);
     });
   });
   document.querySelectorAll('.bar-who, .who-out-n').forEach(el=>{
@@ -1108,14 +1460,15 @@ function closePopover(){
   if(outHandler){document.removeEventListener('mousedown',outHandler);outHandler=null;}
 }
 
-function showPopover(workerIdx, sMin, eMin, anchorRect){
+function showPopover(workerIdx, sMin, eMin, anchorRect, edit){
   closePopover();
+  const isEdit=!!edit;
   const pop=document.createElement('div');
   pop.id='apop';
   pop.innerHTML=`
     <div class="apop-body">
       <div class="apop-hdr">
-        <div class="apop-title">เพิ่มงาน</div>
+        <div class="apop-title">${isEdit?'แก้ไขงาน':'เพิ่มงาน'}</div>
         <button class="apop-x" title="ปิด">✕</button>
       </div>
       <div class="apop-times">
@@ -1132,7 +1485,7 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
         </div>
       </div>
       <div id="apop-warns"></div>
-      <input class="apop-name" id="apop-n" type="text" placeholder="ชื่องาน / เมนู / Batch No." autocomplete="off">
+      <input class="apop-name" id="apop-n" type="text" placeholder="ชื่องาน / เมนู / Batch No." autocomplete="off"${isEdit?` value="${String(edit.name).replace(/"/g,'&quot;')}"`:''}>
       <div class="apop-who-block">
         <div class="apop-who-lbl">ผู้ปฏิบัติงาน</div>
         <div class="apop-who-list"></div>
@@ -1140,7 +1493,7 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
       </div>
       <div class="apop-footer">
         <button class="apop-cancel">ยกเลิก</button>
-        <button class="apop-save">เพิ่มงาน</button>
+        <button class="apop-save">${isEdit?'บันทึก':'เพิ่มงาน'}</button>
       </div>
     </div>`;
   document.body.appendChild(pop);
@@ -1197,15 +1550,22 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
   }
 
   function validate(s,e){
+    const skip=isEdit?edit.items:[];
     const brk=s<BREAK_E&&e>BREAK_S;
     const names=selectedIdxs().filter(idx=>{
-      return WORKERS[idx].t.some(tk=>{const ts=toMin(tk.s),te=toMin(tk.e);return s<te&&e>ts;});
+      return WORKERS[idx].t.some((tk,ti)=>{
+        if(skip.some(x=>x.wi===idx&&x.ti===ti)) return false;
+        const ts=toMin(tk.s),te=toMin(tk.e);return s<te&&e>ts;
+      });
     }).map(idx=>WORKERS[idx].n);
     return{brk,ovlp:names.length>0,names};
   }
   function updateWarns(s,e){
     const v=validate(s,e);
     let h='';
+    if(isEdit&&edit.items&&edit.items.length>1){
+      h+=`<div class="apop-warn warn-ovlp">กำลังแก้ไขทั้งหมด ${edit.items.length} รายการ</div>`;
+    }
     if(v.brk) h+=`<div class="apop-warn warn-brk">🚫 คร่อมพักเบรก 12:30–13:15</div>`;
     if(v.ovlp) h+=`<div class="apop-warn warn-ovlp">⚠️ ทับซ้อนกับงานที่มีอยู่ (${v.names.join(', ')})</div>`;
     document.getElementById('apop-warns').innerHTML=h;
@@ -1230,9 +1590,14 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     return h*60+m;
   }
 
-  addWhoRow(workerIdx);
+  if(isEdit&&edit.whoIdxs&&edit.whoIdxs.length){
+    edit.whoIdxs.forEach(i=>addWhoRow(i));
+  } else {
+    addWhoRow(workerIdx);
+  }
   updateWarns(sMin,eMin);
   placePopover();
+  showScope();
 
   ['apop-sh','apop-sm','apop-eh','apop-em'].forEach(id=>{
     const el=document.getElementById(id);
@@ -1265,22 +1630,31 @@ function showPopover(workerIdx, sMin, eMin, anchorRect){
     if(e<=s)return;
     const idxs=[...new Set(selectedIdxs())];
     if(!idxs.length) return;
+    const cat=isEdit&&edit.cat?edit.cat:'other';
+    if(isEdit&&edit.items){
+      [...edit.items].sort((a,b)=>a.wi-b.wi||b.ti-a.ti).forEach(it=>{
+        WORKERS[it.wi].t.splice(it.ti,1);
+      });
+    }
     idxs.forEach(idx=>{
-      WORKERS[idx].t.push({s:minToTime(s),e:minToTime(e),l:name,c:'other'});
+      WORKERS[idx].t.push({s:minToTime(s),e:minToTime(e),l:name,c:cat});
     });
+    if(isEdit){
+      pulseLabel=name; pulseS=minToTime(s); pulseE=minToTime(e);
+    }
     closePopover();build();
   }
 
   pop.querySelector('.apop-save').addEventListener('click',doSave);
-  pop.querySelector('.apop-cancel').addEventListener('click',closePopover);
-  pop.querySelector('.apop-x').addEventListener('click',closePopover);
+  pop.querySelector('.apop-cancel').addEventListener('click',()=>{closePopover();showScope();});
+  pop.querySelector('.apop-x').addEventListener('click',()=>{closePopover();showScope();});
   document.getElementById('apop-n').addEventListener('keydown',e=>{
     if(e.key==='Enter')doSave();
     if(e.key==='Escape')closePopover();
   });
 
   setTimeout(()=>{
-    outHandler=e=>{if(!pop.contains(e.target))closePopover();};
+    outHandler=e=>{if(!pop.contains(e.target)){closePopover();showScope();}};
     document.addEventListener('mousedown',outHandler);
   },120);
 
@@ -1291,14 +1665,70 @@ document.getElementById('btn-create').addEventListener('click',e=>{
   showPopover(0,DAY_START,DAY_START+30,e.currentTarget.getBoundingClientRect());
 });
 document.getElementById('gs').addEventListener('click',e=>{
-  if(!e.target.closest('.task, .bar-who, .who-out-n')&&!searchQ) setPulse(null);
+  if(didMove){didMove=false;return;}
+  if(!e.target.closest('.task, .bar-who, .who-out-n')&&!searchQ) clearSel();
 });
 document.getElementById('gs').addEventListener('scroll',()=>{
   const t=document.getElementById('tip');
   if(t) t.style.display='none';
+  showScope();
 },{passive:true});
+document.addEventListener('pointermove',e=>{
+  if(moveDrag){
+    e.preventDefault();
+    updateMove(e.clientX,e.clientY);
+    return;
+  }
+  if(!movePend) return;
+  const dx=e.clientX-movePend.x, dy=e.clientY-movePend.y;
+  if(Math.hypot(dx,dy)<8) return;
+  if(e.pointerType!=='mouse'){
+    clearHold();
+    movePend=null;
+    return;
+  }
+  beginMove(movePend);
+  updateMove(e.clientX,e.clientY);
+},{passive:false});
+document.addEventListener('pointerup',e=>{
+  if(moveDrag){
+    endMove(true);
+    return;
+  }
+  const pend=movePend;
+  clearHold();
+  movePend=null;
+  if(!pend||didMove) return;
+  if(Math.hypot(e.clientX-pend.x,e.clientY-pend.y)>8) return;
+  selectBar(pend.el,true);
+  if(!canHover()){
+    if(pulseLabel) showTapTip(pend.el,e);
+    else hideTip();
+  }
+});
+document.addEventListener('pointercancel',()=>{
+  if(moveDrag) endMove(false);
+  clearHold();
+  movePend=null;
+});
+const scopeEl=document.getElementById('scope');
+if(scopeEl){
+  scopeEl.addEventListener('click',e=>{
+    const act=e.target.closest('button[data-act]');
+    if(act){
+      if(act.dataset.act==='edit') editSelected();
+      if(act.dataset.act==='del') deleteSelected();
+      return;
+    }
+    const b=e.target.closest('button[data-mode]');
+    if(!b) return;
+    selMode=b.dataset.mode;
+    applyPulse();
+  });
+}
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
+  if(moveDrag){endMove(false);return;}
   closePopover();
   if(searchQ){
     if(searchInput) searchInput.value='';
@@ -1310,7 +1740,7 @@ document.addEventListener('keydown',e=>{
     closeSearch();
     return;
   }
-  setPulse(null);
+  clearSel();
 });
 
 build();
